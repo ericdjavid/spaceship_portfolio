@@ -895,7 +895,7 @@
             // Typing Sound
             AUDIO.typingSound = new Audio('./text-writting.mp3');
             AUDIO.typingSound.loop = true;
-            AUDIO.typingSound.volume = 0.5;
+            AUDIO.typingSound.volume = 0.2;
             
             // Manual loop fallback
             AUDIO.typingSound.addEventListener('ended', function() {
@@ -1618,10 +1618,19 @@
             }
         }
 
+        let briefingCloseTimer = null;
+
         function showTransmission(message) {
+            if (briefingCloseTimer) clearTimeout(briefingCloseTimer);
+
             const briefing = document.getElementById('mission-briefing');
             const textElement = document.getElementById('briefing-text');
             
+            // Force display reset
+            briefing.style.display = 'block';
+            briefing.style.opacity = '1';
+            briefing.style.transform = 'translateY(0)';
+
             // Reset
             briefing.classList.remove('active');
             void briefing.offsetWidth; // Trigger reflow
@@ -2255,11 +2264,10 @@
         // Mission Briefing System
         const briefingMessages = [
             "Welcome to Sector ALPHA-9, pilot.",
-            "I'm Commander Eric, your guide through this digital frontier.",
-            "This station serves as my command center for indie development operations.",
+            "I'm Commander Eric.",
+            "This station serves a command center for indie development operations.",
             "Navigate to the colored beacons to access different intel stations.",
-            "Use [W][A][S][D] for navigation, [SPACE] for boost, [ENTER] to fire.",
-            "Your mission: Explore. Connect. Build.",
+            "Your mission: Explore. Connect. Build. And protect our colony.",
             "Good luck out there, pilot."
         ];
 
@@ -2311,7 +2319,8 @@
             briefing.style.opacity = '0';
             briefing.style.transform = 'translateY(20px)';
             
-            setTimeout(() => {
+            if (briefingCloseTimer) clearTimeout(briefingCloseTimer);
+            briefingCloseTimer = setTimeout(() => {
                 briefing.classList.remove('active');
                 briefing.style.display = 'none';
             }, 500);
@@ -2359,10 +2368,10 @@
             document.getElementById('carbon-val').innerText = STATE.carbon;
 
             // TEST: Spawn Cargo Ship immediately (Remove this line to disable test)
-            setTimeout(() => {
-                console.log("Spawning Test Cargo Ship");
-                spawnEnemy('cargo');
-            }, 2000);
+            // setTimeout(() => {
+            //     console.log("Spawning Test Cargo Ship");
+            //     spawnEnemy('cargo');
+            // }, 2000);
         });
 
         // Initialize and start audio on first user interaction
