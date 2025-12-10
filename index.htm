@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indie Hacker | Tactical Command</title>
+    
+    <!-- Social Metadata -->
+    <meta property="og:title" content="Indie Hacker | Tactical Command">
+    <meta property="og:description" content="A tactical 3D command center for Eric Djavid's portfolio. Explore. Connect. Build.">
+    <meta property="og:image" content="./ericdjav.jpg">
+    <meta property="og:url" content="https://ericdjav.io">
+    <meta property="og:type" content="website">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Indie Hacker | Tactical Command">
+    <meta name="twitter:description" content="A tactical 3D command center for Eric Djavid's portfolio. Explore. Connect. Build.">
+    <meta name="twitter:image" content="./ericdjav.jpg">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050505;
+            font-family: 'Share Tech Mono', monospace;
+            color: #0f0;
+            user-select: none;
+        }
+
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #canvas-container canvas {
+            display: block;
+        }
+
+        /* UI Layer */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            /* Flex layout removed, we position absolute elements now */
+        }
+
+        .hud-panel {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            border: 1px solid #0f0;
+            background: rgba(0, 17, 0, 0.9);
+            padding: 15px;
+            backdrop-filter: blur(2px);
+            max-width: 300px;
+        }
+
+        h1 {
+            margin: 0 0 5px 0;
+            font-size: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px #0f0;
+            color: #0f0;
+        }
+
+        .panel-label {
+            position: absolute;
+            top: -22px;
+            right: 0;
+            font-size: 12px;
+            background: #000;
+            padding: 2px 5px;
+            border: 1px solid #0f0;
+            border-bottom: none;
+            color: #0f0;
+        }
+
+        /* Controls Bar */
+        #controls-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            background: rgba(0, 17, 0, 0.9);
+            padding: 15px 20px;
+            border: 2px solid #0f0;
+            z-index: 20;
+            min-width: 400px;
+            display: block; /* Toggled via JS */
+            pointer-events: auto;
+        }
+
+        .key {
+            display: inline-block;
+            border: 1px solid #0f0;
+            padding: 2px 6px;
+            margin: 0 2px;
+            border-radius: 2px;
+            font-size: 12px;
+            background: #002200;
+            color: #fff;
+        }
+
+        /* Audio Control */
+        #audio-toggle {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 17, 0, 0.9);
+            border: 2px solid #0f0;
+            color: #0f0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            z-index: 25;
+            transition: all 0.3s ease;
+        }
+
+        #audio-toggle:hover {
+            background: rgba(0, 34, 0, 0.9);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        #audio-toggle.muted {
+            color: #ff0000;
+            border-color: #ff0000;
+        }
+
+        .audio-label {
+            position: absolute;
+            top: -22px;
+            left: 0;
+            right: 0;
+            font-size: 10px;
+            background: #000;
+            padding: 2px 5px;
+            border: 1px solid #0f0;
+            border-bottom: none;
+            color: #0f0;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        #audio-toggle.muted .audio-label {
+            color: #ff0000;
+            border-color: #ff0000;
+        }
+
+        .audio-credits {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 200px;
+            background: rgba(0, 17, 0, 0.9);
+            border: 1px solid #0f0;
+            padding: 10px;
+            font-size: 10px;
+            color: #0f0;
+            display: none;
+            text-align: right;
+            z-index: 30;
+            pointer-events: auto;
+        }
+
+        #audio-toggle:hover .audio-credits {
+            display: block;
+        }
+
+        .audio-credits a {
+            color: #fff;
+            text-decoration: none;
+            border-bottom: 1px dotted #fff;
+        }
+        
+        .sub-text {
+            font-size: 12px;
+            opacity: 0.9;
+            color: #8f8;
+            margin: 0 5px;
+        }
+
+        /* Mini Map */
+        #minimap-container {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 200px;
+            height: 200px;
+            background: rgba(0, 17, 0, 0.9);
+            border: 2px solid #0f0;
+            z-index: 20;
+            display: block; /* Toggled via JS */
+            pointer-events: auto;
+        }
+        
+        #minimap-canvas {
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+        }
+
+        /* Modals */
+        .modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 500px;
+            background: #001100;
+            border: 2px solid #0f0;
+            padding: 30px;
+            color: #fff;
+            z-index: 100;
+            pointer-events: auto;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+        }
+
+        .modal.active {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal h2 {
+            color: #0f0;
+            border-bottom: 1px solid #0f0;
+            padding-bottom: 10px;
+            margin-top: 0;
+            text-transform: uppercase;
+        }
+
+        .modal p {
+            line-height: 1.6;
+            color: #cfc;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: #0f0;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .close-btn:hover { color: #fff; }
+
+        /* Scanlines */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 20;
+            opacity: 0.3;
+        }
+
+        /* Mission Briefing */
+        #mission-briefing {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 380px;
+            background: linear-gradient(135deg, rgba(0, 17, 0, 0.95) 0%, rgba(0, 34, 0, 0.9) 100%);
+            border: 2px solid #0f0;
+            padding: 0;
+            z-index: 50;
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3), inset 0 0 20px rgba(0, 255, 0, 0.1);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        #mission-briefing.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .briefing-header {
+            background: #001100;
+            padding: 8px 15px;
+            border-bottom: 1px solid #0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .briefing-title {
+            color: #0f0;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .briefing-close {
+            color: #0f0;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 5px;
+            border: 1px solid #0f0;
+            background: transparent;
+            transition: all 0.2s;
+        }
+
+        .briefing-close:hover {
+            background: #0f0;
+            color: #000;
+        }
+
+        .briefing-content {
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .commander-image {
+            width: 120px;
+            height: 120px;
+            border: 2px solid #0f0;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .commander-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: contrast(1.2) brightness(0.9);
+        }
+
+        .commander-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.3), transparent);
+            animation: scanline 3s infinite;
+        }
+
+        @keyframes scanline {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .briefing-message {
+            flex: 1;
+            color: #0f0;
+        }
+
+        .message-sender {
+            color: #ffff00;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .message-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #0f0;
+            min-height: 60px;
+        }
+
+        .typewriter {
+            overflow: hidden;
+            white-space: pre-wrap;
+            animation: typing 0.05s steps(1) infinite;
+        }
+
+        @keyframes typing {
+            from { border-right: 2px solid #0f0; }
+            to { border-right: 2px solid transparent; }
+        }
+
+        .briefing-footer {
+            padding: 10px 20px;
+            border-top: 1px solid #0f0;
+            text-align: right;
+            font-size: 11px;
+            color: #8f8;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines"></div>
+
+    <!-- Mission Briefing -->
+    <div id="mission-briefing">
+        <div class="briefing-header">
+            <span class="briefing-title">⚡ INCOMING TRANSMISSION</span>
+            <button class="briefing-close" onclick="closeBriefing()">X</button>
+        </div>
+        <div class="briefing-content">
+            <div class="commander-image">
+                <img src="./matrix.png" alt="Commander" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iIzAwMTEwMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmaWxsPSIjMGYwIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+W05PIElNQUdFXTwvdGV4dD48L3N2Zz4='">
+            </div>
+            <div class="briefing-message">
+                <div class="message-sender">COMMANDER ERIC</div>
+                <div class="message-text" id="briefing-text"></div>
+            </div>
+        </div>
+        <div class="briefing-footer">
+            Press [SPACE] to continue • Sector: ALPHA-9 • Status: ACTIVE
+        </div>
+    </div>
+
+    <div id="ui-layer">
+        
+        <!-- Audio Control -->
+        <div id="audio-toggle" onclick="toggleAudio()" style="pointer-events: auto;">
+            <div class="audio-label">AUDIO</div>
+            <span id="audio-icon">🔊</span>
+            <div class="audio-credits">
+                Music by <a href="https://pixabay.com/users/nickpanek-38266323/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=357518" target="_blank">Nicholas Panek</a> from <a href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=357518" target="_blank">Pixabay</a>
+            </div>
+        </div>
+        
+        <!-- HUD Panel -->
+        <div class="hud-panel">
+            <h1>Tactical View</h1>
+            <div class="sub-text">Sector: Alpha-9</div>
+            <div class="sub-text" id="coords">Pos: 0, 0</div>
+        </div>
+
+        <!-- Controls Panel -->
+        <div id="controls-hint">
+            <div class="panel-label">CONTROLS [C]</div>
+            
+            <span class="sub-text">NAV:</span> 
+            <span class="key">W</span> <span class="key">A</span> <span class="key">S</span> <span class="key">D</span>
+            <span class="sub-text">|</span>
+            
+            <span class="sub-text">BOOST:</span>
+            <span class="key">SPACE</span> 
+            <span class="sub-text">|</span>
+
+            <span class="sub-text">FIRE:</span>
+            <span class="key">ENTER</span>
+        </div>
+
+        <!-- Radar Panel -->
+        <div id="minimap-container">
+            <div class="panel-label">RADAR [M]</div>
+            <canvas id="minimap-canvas" width="200" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-about" class="modal">
+        <span class="close-btn" onclick="closeModal()">[X]</span>
+        <h2>// Base Station: Alpha</h2>
+        <p><strong>Operator:</strong> Eric Djavid</p>
+        
+        <p><strong>Training Credentials:</strong></p>
+        <p style="color: #cfc; margin-left: 20px;">
+            <span style="color: #ffff00;">►</span> 42 Paris - Elite coding academy<br>
+            <span style="color: #ffff00;">►</span> HEC Paris - Business excellence<br>
+            <span style="color: #00ffff;">→</span> Unique hybrid: Engineering × Entrepreneurship
+        </p>
+        
+        <p><strong>Mission Profile:</strong></p>
+        <p>I build cool products and travel the world. My approach combines technical depth from 42's peer-to-peer learning methodology with strategic thinking from HEC's business frameworks.</p>
+        
+        <p><strong>Core Capabilities:</strong></p>
+        <p style="color: #cfc; margin-left: 20px;">
+            <span style="color: #0f0;">◆</span> Full-stack development & system architecture<br>
+            <span style="color: #0f0;">◆</span> Product strategy & market validation<br>
+            <span style="color: #0f0;">◆</span> Scalable web systems & 3D interactives<br>
+            <span style="color: #0f0;">◆</span> Remote work from anywhere on Earth
+        </p>
+        
+        <p><strong>Philosophy:</strong></p>
+        <p style="font-style: italic; color: #8f8; border-left: 2px solid #0f0; padding-left: 15px; margin: 15px 0;">
+            "Turn complex problems into elegant solutions. Ship fast, iterate faster. Build products that matter while exploring the world."
+        </p>
+        
+        <p style="text-align: center; margin-top: 20px; color: #ffff00; font-size: 12px;">
+            [ STATUS: ACTIVELY BUILDING | LOCATION: VARIABLE ]
+        </p>
+    </div>
+
+    <div id="modal-projects" class="modal">
+        <span class="close-btn" onclick="closeModal()">[X]</span>
+        <h2>// Mining Outpost: Beta</h2>
+        <p><strong>Active Deployments:</strong></p>
+        <ul>
+            <li><strong>SaaS Kit:</strong> React/Node starter for founders.</li>
+            <li><strong>Glitch UI:</strong> A cyberpunk component library.</li>
+            <li><strong>Iso-Game:</strong> This very website.</li>
+        </ul>
+    </div>
+
+    <div id="modal-contact" class="modal">
+        <span class="close-btn" onclick="closeModal()">[X]</span>
+        <h2>// Comms Relay</h2>
+        <p>Frequency Open.</p>
+        <p>Email: <a href="mailto:hey@ericdjav.io" style="color: #0f0; text-decoration: none;">hey@ericdjav.io</a></p>
+        <p>
+            <a href="https://x.com/ericdjav" target="_blank" style="color: #0f0; margin-right: 15px; text-decoration: none; border-bottom: 1px dashed #0f0;">[X / TWITTER]</a>
+            <a href="https://www.linkedin.com/in/eric-djavid-2154b991/" target="_blank" style="color: #0f0; text-decoration: none; border-bottom: 1px dashed #0f0;">[LINKEDIN]</a>
+        </p>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // --- CONFIG ---
+        const CONFIG = {
+            moveSpeed: 0.4,
+            boostSpeed: 1.2,
+            turnSpeed: 0.1,
+            friction: 0.92,
+            camZoom: 40,
+            mapBounds: 100, // Wrap at +/- 100
+            colors: {
+                bg: 0x050505,
+                grid: 0x003300,
+                ship: 0x00ff00,
+                asteroid: 0x224422,
+                planet: 0x001100,
+                projectile: 0xffff00
+            }
+        };
+
+        // --- STATE ---
+        const STATE = {
+            velocity: new THREE.Vector3(),
+            keys: { 
+                w: false, a: false, s: false, d: false, 
+                ArrowUp: false, ArrowLeft: false, ArrowDown: false, ArrowRight: false,
+                " ": false, Enter: false, m: false, c: false
+            },
+            modalOpen: false,
+            lastShotTime: 0,
+            projectiles: [],
+            mapVisible: true,
+            controlsVisible: true,
+            briefingShown: false,
+            audioEnabled: true
+        };
+
+        // --- AUDIO SYSTEM ---
+        const AUDIO = {
+            bgMusic: null,
+            laserSound: null,
+            explosionSound: null,
+            initialized: false
+        };
+
+        function initAudio() {
+            if (AUDIO.initialized) return;
+            
+            // Background Music
+            AUDIO.bgMusic = new Audio('./cool_song.mp3');
+            AUDIO.bgMusic.loop = true;
+            AUDIO.bgMusic.volume = 0.3;
+            
+            // Laser Sound
+            AUDIO.laserSound = new Audio('./laser.mp3');
+            AUDIO.laserSound.volume = 0.2;  // Reduced from 0.5
+            
+            // Explosion Sound
+            AUDIO.explosionSound = new Audio('./explosion.mp3');
+            AUDIO.explosionSound.volume = 0.3;  // Reduced from 0.6
+            
+            AUDIO.initialized = true;
+            
+            // Start background music
+            if (STATE.audioEnabled) {
+                AUDIO.bgMusic.play().catch(e => {
+                    console.log('Audio autoplay blocked, will play on user interaction');
+                });
+            }
+        }
+
+        function toggleAudio() {
+            STATE.audioEnabled = !STATE.audioEnabled;
+            const icon = document.getElementById('audio-icon');
+            const toggle = document.getElementById('audio-toggle');
+            
+            if (STATE.audioEnabled) {
+                icon.textContent = '🔊';
+                toggle.classList.remove('muted');
+                if (AUDIO.bgMusic) {
+                    AUDIO.bgMusic.play().catch(e => console.log('Audio play failed'));
+                }
+            } else {
+                icon.textContent = '🔇';
+                toggle.classList.add('muted');
+                if (AUDIO.bgMusic) {
+                    AUDIO.bgMusic.pause();
+                }
+            }
+        }
+
+        function playLaserSound() {
+            if (!STATE.audioEnabled || !AUDIO.laserSound) return;
+            // Clone and play to allow multiple simultaneous sounds
+            const sound = AUDIO.laserSound.cloneNode();
+            sound.volume = 0.2;  // Reduced from 0.5
+            sound.play().catch(e => console.log('Laser sound failed'));
+        }
+
+        function playExplosionSound() {
+            if (!STATE.audioEnabled || !AUDIO.explosionSound) return;
+            // Clone and play to allow multiple simultaneous sounds
+            const sound = AUDIO.explosionSound.cloneNode();
+            sound.volume = 0.3;  // Reduced from 0.6
+            sound.play().catch(e => console.log('Explosion sound failed'));
+        }
+
+        // --- SCENE SETUP ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(CONFIG.colors.bg);
+        
+        // ISOMETRIC CAMERA setup
+        const aspect = window.innerWidth / window.innerHeight;
+        const d = CONFIG.camZoom;
+        const camera = new THREE.OrthographicCamera(-d * aspect, d * aspect, d, -d, 1, 1000);
+        
+        // Classic Isometric Angle
+        camera.position.set(20, 20, 20); 
+        camera.lookAt(scene.position); 
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // --- LIGHTING ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(10, 20, 10);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        scene.add(dirLight);
+
+        // --- ENVIRONMENT ---
+
+        // 1. The Grid (Tactical Floor)
+        const gridHelper = new THREE.GridHelper(CONFIG.mapBounds * 2, 40, 0x00ff00, 0x002200);
+        scene.add(gridHelper);
+
+        // 2. The Plane (Hero)
+        const planeGroup = new THREE.Group();
+        
+        // Fuselage
+        const fuselageGeo = new THREE.BoxGeometry(1.5, 0.5, 3);
+        const planeMat = new THREE.MeshPhongMaterial({ color: 0x00cc00, shininess: 50 });
+        const fuselage = new THREE.Mesh(fuselageGeo, planeMat);
+        fuselage.castShadow = true;
+        planeGroup.add(fuselage);
+
+        // Wings
+        const wingGeo = new THREE.BoxGeometry(6, 0.2, 1.5);
+        const wings = new THREE.Mesh(wingGeo, planeMat);
+        wings.position.set(0, 0, 0.5);
+        wings.castShadow = true;
+        planeGroup.add(wings);
+
+        // Tail
+        const tailGeo = new THREE.BoxGeometry(2, 0.2, 1);
+        const tail = new THREE.Mesh(tailGeo, planeMat);
+        tail.position.set(0, 0.5, -1.2);
+        tail.castShadow = true;
+        planeGroup.add(tail);
+
+        // Cockpit
+        const cockpitGeo = new THREE.BoxGeometry(0.8, 0.4, 1);
+        const cockpitMat = new THREE.MeshPhongMaterial({ color: 0x000000 });
+        const cockpit = new THREE.Mesh(cockpitGeo, cockpitMat);
+        cockpit.position.set(0, 0.4, 0.5);
+        planeGroup.add(cockpit);
+
+        scene.add(planeGroup);
+
+        // Trail particles array
+        const trailParticles = [];
+
+
+        // 3. Asteroids & Planets
+        let asteroids = [];
+
+        function createAsteroid(x, z, scale) {
+            const geo = new THREE.IcosahedronGeometry(1, 0);
+            const mat = new THREE.MeshPhongMaterial({ 
+                color: CONFIG.colors.asteroid, 
+                flatShading: true,
+                wireframe: false 
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            
+            // Randomize shape slightly
+            const posAttribute = geo.attributes.position;
+            for (let i = 0; i < posAttribute.count; i++) {
+                posAttribute.setXYZ(
+                    i,
+                    posAttribute.getX(i) + (Math.random() - 0.5) * 0.5,
+                    posAttribute.getY(i) + (Math.random() - 0.5) * 0.5,
+                    posAttribute.getZ(i) + (Math.random() - 0.5) * 0.5
+                );
+            }
+            geo.computeVertexNormals();
+
+            mesh.position.set(x, Math.random() * 2 + 1, z);
+            mesh.scale.set(scale, scale, scale);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            
+            // Random rotation
+            mesh.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
+            
+            scene.add(mesh);
+            asteroids.push({ mesh, rotSpeed: (Math.random()-0.5) * 0.02, radius: scale });
+        }
+
+        // Generate Field
+        for(let i=0; i<30; i++) {
+            const x = (Math.random() - 0.5) * 160;
+            const z = (Math.random() - 0.5) * 160;
+            if (Math.abs(x) < 10 && Math.abs(z) < 10) continue;
+            createAsteroid(x, z, 1 + Math.random() * 2);
+        }
+
+        // 4. Planets / Bases (Interactive Points)
+        const bases = [];
+        
+        function createBase(x, z, color, label, type) {
+            const group = new THREE.Group();
+            group.position.set(x, 0, z);
+
+            // Planet wireframe
+            const geo = new THREE.IcosahedronGeometry(4, 1);
+            const mat = new THREE.MeshBasicMaterial({ color: color, wireframe: true, transparent: true, opacity: 0.3 });
+            const planet = new THREE.Mesh(geo, mat);
+            group.add(planet);
+
+            // Core
+            const coreGeo = new THREE.OctahedronGeometry(1.5, 0);
+            const coreMat = new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.5 });
+            const core = new THREE.Mesh(coreGeo, coreMat);
+            core.userData = { offset: Math.random() * 10 };
+            group.add(core);
+
+            // Label
+            const canvas = document.createElement('canvas');
+            canvas.width = 256; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#' + new THREE.Color(color).getHexString();
+            ctx.font = 'bold 30px "Share Tech Mono"';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, 128, 32);
+            
+            const tex = new THREE.CanvasTexture(canvas);
+            const labelMat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+            const labelSprite = new THREE.Sprite(labelMat);
+            labelSprite.scale.set(10, 2.5, 1);
+            labelSprite.position.y = 6;
+            group.add(labelSprite);
+
+            // Floor Ring
+            const ringGeo = new THREE.RingGeometry(5, 5.2, 32);
+            ringGeo.rotateX(-Math.PI / 2);
+            const ringMat = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.position.y = 0.1;
+            group.add(ring);
+
+            scene.add(group);
+            bases.push({ group, core, type, radius: 5, colorString: '#' + new THREE.Color(color).getHexString() });
+        }
+
+        createBase(-30, -30, 0x00ffff, "ABOUT_BASE", "about");
+        createBase(30, -20, 0xff00ff, "PROJECT_HUB", "projects");
+        createBase(0, 40, 0xffff00, "COMMS_RELAY", "contact");
+
+
+        // --- INPUT HANDLING ---
+        window.addEventListener('keydown', (e) => {
+            if (STATE.keys.hasOwnProperty(e.key) || STATE.keys.hasOwnProperty(e.code)) {
+                STATE.keys[e.key] = true;
+                STATE.keys[e.code] = true; 
+            }
+            if (e.key === 'm' || e.key === 'M') {
+                toggleMinimap();
+            }
+            if (e.key === 'c' || e.key === 'C') {
+                toggleControls();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (STATE.keys.hasOwnProperty(e.key) || STATE.keys.hasOwnProperty(e.code)) {
+                STATE.keys[e.key] = false;
+                STATE.keys[e.code] = false;
+            }
+        });
+
+        function toggleMinimap() {
+            STATE.mapVisible = !STATE.mapVisible;
+            const mapEl = document.getElementById('minimap-container');
+            mapEl.style.display = STATE.mapVisible ? 'block' : 'none';
+        }
+
+        function toggleControls() {
+            STATE.controlsVisible = !STATE.controlsVisible;
+            const ctrlEl = document.getElementById('controls-hint');
+            ctrlEl.style.display = STATE.controlsVisible ? 'block' : 'none';
+        }
+
+        // --- GAME LOGIC ---
+
+        function shoot() {
+            const now = Date.now();
+            if (now - STATE.lastShotTime < 200) return; // Fire rate limit
+            STATE.lastShotTime = now;
+
+            const geo = new THREE.BoxGeometry(0.3, 0.3, 1);
+            const mat = new THREE.MeshBasicMaterial({ color: CONFIG.colors.projectile });
+            const bullet = new THREE.Mesh(geo, mat);
+            
+            bullet.position.copy(planeGroup.position);
+            bullet.rotation.copy(planeGroup.rotation);
+            
+            // Calculate forward vector
+            const direction = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), planeGroup.rotation.y);
+            
+            scene.add(bullet);
+            STATE.projectiles.push({ mesh: bullet, dir: direction, life: 100 });
+            
+            // Play laser sound
+            playLaserSound();
+        }
+
+        function updateProjectiles() {
+            // Check for shoot input
+            if (STATE.keys.Enter && !STATE.modalOpen) {
+                shoot();
+            }
+
+            for (let i = STATE.projectiles.length - 1; i >= 0; i--) {
+                const p = STATE.projectiles[i];
+                p.mesh.position.add(p.dir.clone().multiplyScalar(2)); // Bullet speed
+                p.life--;
+
+                let hit = false;
+                // Collision with asteroids
+                for (let j = asteroids.length - 1; j >= 0; j--) {
+                    const ast = asteroids[j];
+                    if (p.mesh.position.distanceTo(ast.mesh.position) < ast.radius + 1) {
+                        // HIT!
+                        // Remove Asteroid
+                        scene.remove(ast.mesh);
+                        asteroids.splice(j, 1);
+                        
+                        // Create explosion effect (simple expansion)
+                        const expGeo = new THREE.SphereGeometry(1, 8, 8);
+                        const expMat = new THREE.MeshBasicMaterial({ color: 0xffaa00, wireframe: true });
+                        const exp = new THREE.Mesh(expGeo, expMat);
+                        exp.position.copy(ast.mesh.position);
+                        scene.add(exp);
+                        trailParticles.push({ mesh: exp, life: 0.5, type: 'explosion' }); // Reuse trail logic for cleanup
+
+                        // Play explosion sound
+                        playExplosionSound();
+
+                        hit = true;
+                        break;
+                    }
+                }
+
+                if (hit || p.life <= 0) {
+                    scene.remove(p.mesh);
+                    STATE.projectiles.splice(i, 1);
+                }
+            }
+        }
+
+        function updatePhysics() {
+            if (STATE.modalOpen) return;
+
+            // Input Vector
+            const input = new THREE.Vector3(0, 0, 0);
+            if (STATE.keys.w || STATE.keys.ArrowUp) input.z -= 1;
+            if (STATE.keys.s || STATE.keys.ArrowDown) input.z += 1;
+            if (STATE.keys.a || STATE.keys.ArrowLeft) input.x -= 1;
+            if (STATE.keys.d || STATE.keys.ArrowRight) input.x += 1;
+
+            if (input.length() > 0) input.normalize();
+
+            // Speed & Boost Logic
+            let currentMaxSpeed = CONFIG.moveSpeed;
+            if (STATE.keys[" "]) currentMaxSpeed = CONFIG.boostSpeed; // Boost
+
+            // Apply Acceleration / Friction
+            if (input.length() > 0) {
+                STATE.velocity.add(input.multiplyScalar(0.05)); 
+                STATE.velocity.clampLength(0, currentMaxSpeed);
+                
+                const angle = Math.atan2(STATE.velocity.x, STATE.velocity.z);
+                let rotDiff = angle - planeGroup.rotation.y;
+                while (rotDiff > Math.PI) rotDiff -= Math.PI * 2;
+                while (rotDiff < -Math.PI) rotDiff += Math.PI * 2;
+                
+                planeGroup.rotation.y += rotDiff * 0.1;
+                planeGroup.rotation.z = -rotDiff * 0.5;
+            } else {
+                STATE.velocity.multiplyScalar(CONFIG.friction);
+                planeGroup.rotation.z *= 0.9;
+            }
+
+            planeGroup.position.add(STATE.velocity);
+
+            // MAP WRAPPING LOGIC (Teleport)
+            if (planeGroup.position.x > CONFIG.mapBounds) planeGroup.position.x = -CONFIG.mapBounds;
+            if (planeGroup.position.x < -CONFIG.mapBounds) planeGroup.position.x = CONFIG.mapBounds;
+            if (planeGroup.position.z > CONFIG.mapBounds) planeGroup.position.z = -CONFIG.mapBounds;
+            if (planeGroup.position.z < -CONFIG.mapBounds) planeGroup.position.z = CONFIG.mapBounds;
+
+            // Camera Follow
+            const camOffset = new THREE.Vector3(20, 20, 20);
+            
+            // Adjust camera lag for warp effect (snap if distance is huge)
+            if (camera.position.distanceTo(planeGroup.position) > 100) {
+                 camera.position.copy(planeGroup.position).add(camOffset);
+            } else {
+                 const targetPos = planeGroup.position.clone().add(camOffset);
+                 camera.position.lerp(targetPos, 0.1);
+            }
+        }
+
+        function checkInteractions() {
+            if (STATE.modalOpen) return;
+            bases.forEach(base => {
+                const dist = planeGroup.position.distanceTo(base.group.position);
+                base.group.rotation.y += 0.005;
+                base.core.position.y = 2 + Math.sin(Date.now() * 0.002 + base.core.userData.offset) * 0.5;
+                if (dist < base.radius) {
+                    openModal(base.type);
+                    STATE.velocity.set(0,0,0);
+                }
+            });
+        }
+
+        function openModal(type) {
+            STATE.modalOpen = true;
+            document.getElementById(`modal-${type}`).classList.add('active');
+        }
+
+        window.closeModal = function() {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+            setTimeout(() => { STATE.modalOpen = false; }, 200);
+            planeGroup.position.x -= Math.sin(planeGroup.rotation.y) * 5;
+            planeGroup.position.z -= Math.cos(planeGroup.rotation.y) * 5;
+        }
+
+        function createEngineTrail() {
+            // Boost Trail or Normal Trail
+            if (STATE.velocity.length() < 0.1) return;
+            const boost = STATE.keys[" "];
+            if (!boost && Math.random() > 0.3) return;
+
+            const geo = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+            const color = boost ? 0xffff00 : 0x00ff00; // Yellow for boost
+            const mat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.6 });
+            const p = new THREE.Mesh(geo, mat);
+            
+            const offset = new THREE.Vector3(0, 0, 1.5).applyAxisAngle(new THREE.Vector3(0,1,0), planeGroup.rotation.y);
+            p.position.copy(planeGroup.position).add(offset);
+            
+            scene.add(p);
+            trailParticles.push({ mesh: p, life: 1.0, type: 'trail' });
+        }
+
+        // --- MINI MAP RENDERER ---
+        const mapCanvas = document.getElementById('minimap-canvas');
+        const mapCtx = mapCanvas.getContext('2d');
+
+        function updateMinimap() {
+            if (!STATE.mapVisible) return;
+
+            const w = mapCanvas.width;
+            const h = mapCanvas.height;
+            const mapScale = w / (CONFIG.mapBounds * 2); // Map units to pixels
+
+            // Clear
+            mapCtx.fillStyle = '#001100';
+            mapCtx.fillRect(0, 0, w, h);
+            
+            // Grid Lines (Visual only)
+            mapCtx.strokeStyle = '#003300';
+            mapCtx.beginPath();
+            mapCtx.moveTo(w/2, 0); mapCtx.lineTo(w/2, h);
+            mapCtx.moveTo(0, h/2); mapCtx.lineTo(w, h/2);
+            mapCtx.stroke();
+
+            // Transform helper
+            const toMapX = (x) => (x + CONFIG.mapBounds) * mapScale;
+            const toMapY = (z) => (z + CONFIG.mapBounds) * mapScale;
+
+            // Draw Asteroids
+            mapCtx.fillStyle = '#446644';
+            asteroids.forEach(a => {
+                mapCtx.beginPath();
+                mapCtx.arc(toMapX(a.mesh.position.x), toMapY(a.mesh.position.z), 2, 0, Math.PI*2);
+                mapCtx.fill();
+            });
+
+            // Draw Bases
+            bases.forEach(b => {
+                mapCtx.fillStyle = b.colorString;
+                mapCtx.beginPath();
+                mapCtx.arc(toMapX(b.group.position.x), toMapY(b.group.position.z), 4, 0, Math.PI*2);
+                mapCtx.fill();
+            });
+
+            // Draw Player
+            mapCtx.fillStyle = '#00ff00';
+            mapCtx.beginPath();
+            const px = toMapX(planeGroup.position.x);
+            const py = toMapY(planeGroup.position.z);
+            
+            // Draw simple triangle for player direction
+            mapCtx.save();
+            mapCtx.translate(px, py);
+            mapCtx.rotate(-planeGroup.rotation.y + Math.PI); // Rotate context matches map orientation
+            mapCtx.beginPath();
+            mapCtx.moveTo(0, -4);
+            mapCtx.lineTo(3, 3);
+            mapCtx.lineTo(-3, 3);
+            mapCtx.closePath();
+            mapCtx.fill();
+            mapCtx.restore();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            updatePhysics();
+            updateProjectiles();
+            checkInteractions();
+            createEngineTrail();
+            updateMinimap();
+
+            // Animate Trails & Explosions
+            for (let i = trailParticles.length - 1; i >= 0; i--) {
+                const p = trailParticles[i];
+                p.life -= p.type === 'explosion' ? 0.05 : 0.02;
+                
+                if (p.type === 'explosion') {
+                    p.mesh.scale.multiplyScalar(1.1); // Expand
+                    p.mesh.material.opacity = p.life;
+                } else {
+                    p.mesh.position.y += 0.05; 
+                    p.mesh.rotation.x += 0.1;
+                    p.mesh.scale.multiplyScalar(0.95);
+                    p.mesh.material.opacity = p.life;
+                }
+                
+                if (p.life <= 0) {
+                    scene.remove(p.mesh);
+                    trailParticles.splice(i, 1);
+                }
+            }
+
+            asteroids.forEach(a => {
+                a.mesh.rotation.y += a.rotSpeed;
+                a.mesh.rotation.x += a.rotSpeed;
+            });
+            
+            // HUD Update
+            document.getElementById('coords').innerText = `POS: ${Math.round(planeGroup.position.x)}, ${Math.round(planeGroup.position.z)}`;
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            const aspect = window.innerWidth / window.innerHeight;
+            const d = CONFIG.camZoom;
+            camera.left = -d * aspect;
+            camera.right = d * aspect;
+            camera.top = d;
+            camera.bottom = -d;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+
+        // Mission Briefing System
+        const briefingMessages = [
+            "Welcome to Sector ALPHA-9, pilot.",
+            "I'm Commander Eric, your guide through this digital frontier.",
+            "This station serves as my command center for indie development operations.",
+            "Navigate to the colored beacons to access different intel stations.",
+            "Use [W][A][S][D] for navigation, [SPACE] for boost, [ENTER] to fire.",
+            "Your mission: Explore. Connect. Build.",
+            "Good luck out there, pilot."
+        ];
+
+        function showBriefing() {
+            if (STATE.briefingShown) return;
+            STATE.briefingShown = true;
+            
+            setTimeout(() => {
+                const briefing = document.getElementById('mission-briefing');
+                briefing.classList.add('active');
+                typewriterEffect();
+            }, 1000);
+        }
+
+        function typewriterEffect() {
+            const textElement = document.getElementById('briefing-text');
+            const fullText = briefingMessages.join(' ');
+            let index = 0;
+            
+            textElement.classList.add('typewriter');
+            
+            const typeInterval = setInterval(() => {
+                if (index < fullText.length) {
+                    textElement.textContent = fullText.substring(0, index + 1);
+                    index++;
+                } else {
+                    clearInterval(typeInterval);
+                    textElement.classList.remove('typewriter');
+                    
+                    // Auto-close after 15 seconds
+                    setTimeout(() => {
+                        closeBriefing();
+                    }, 15000);
+                }
+            }, 30);
+        }
+
+        function closeBriefing() {
+            const briefing = document.getElementById('mission-briefing');
+            briefing.style.opacity = '0';
+            briefing.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                briefing.classList.remove('active');
+                briefing.style.display = 'none';
+            }, 500);
+        }
+
+        // Listen for space to close briefing early
+        window.addEventListener('keydown', (e) => {
+            if (e.key === ' ' && document.getElementById('mission-briefing').classList.contains('active')) {
+                closeBriefing();
+            }
+        });
+
+        // Function to start audio on user interaction
+        function startAudioOnInteraction() {
+            if (!AUDIO.initialized) {
+                initAudio();
+            } else if (STATE.audioEnabled && AUDIO.bgMusic && AUDIO.bgMusic.paused) {
+                AUDIO.bgMusic.play().catch(e => console.log('Audio play failed'));
+            }
+        }
+
+        // Show briefing on load and initialize audio
+        window.addEventListener('load', () => {
+            showBriefing();
+            initAudio();
+        });
+
+        // Initialize and start audio on first user interaction
+        document.addEventListener('click', () => {
+            startAudioOnInteraction();
+        }, { once: false });  // Changed to false to handle multiple attempts
+
+        document.addEventListener('keydown', () => {
+            startAudioOnInteraction();
+        }, { once: false });  // Changed to false to handle multiple attempts
+
+        // Also try to start audio when closing the briefing
+        window.addEventListener('keydown', (e) => {
+            if (e.key === ' ' && document.getElementById('mission-briefing').classList.contains('active')) {
+                startAudioOnInteraction();
+            }
+        });
+
+    </script>
+</body>
+</html>
