@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indie Hacker | Tactical Command</title>
+    <title>Eric Djavid | Tactical Command</title>
     
     <!-- Social Metadata -->
-    <meta property="og:title" content="Indie Hacker | Tactical Command">
+    <meta property="og:title" content="Eric Djavid">
     <meta property="og:description" content="A tactical 3D command center for Eric Djavid's portfolio. Explore. Connect. Build.">
     <meta property="og:image" content="./ericdjav.jpg">
     <meta property="og:url" content="https://ericdjav.io">
     <meta property="og:type" content="website">
     
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Indie Hacker | Tactical Command">
+    <meta name="twitter:title" content="Eric Djavid | Tactical Command">
     <meta name="twitter:description" content="A tactical 3D command center for Eric Djavid's portfolio. Explore. Connect. Build.">
     <meta name="twitter:image" content="./ericdjav.jpg">
 
@@ -222,6 +222,8 @@
             left: 50%;
             transform: translate(-50%, -50%) scale(0.9);
             width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
             background: #001100;
             border: 2px solid #0f0;
             padding: 30px;
@@ -232,6 +234,19 @@
             opacity: 0;
             transition: opacity 0.3s ease, transform 0.3s ease;
             box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+            scrollbar-width: thin;
+            scrollbar-color: #0f0 #001100;
+        }
+
+        .modal::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal::-webkit-scrollbar-track {
+            background: #001100;
+        }
+        .modal::-webkit-scrollbar-thumb {
+            background-color: #0f0;
+            border-radius: 4px;
         }
 
         .modal.active {
@@ -298,6 +313,41 @@
             display: block;
             opacity: 1;
             transform: translateY(0);
+        }
+
+        #game-over {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(20, 0, 0, 0.8);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            pointer-events: auto;
+        }
+
+        #game-over h1 {
+            font-size: 60px;
+            color: #f00;
+            text-shadow: 0 0 20px #f00;
+            margin-bottom: 20px;
+        }
+
+        #game-over button {
+            background: #000;
+            color: #f00;
+            border: 2px solid #f00;
+            padding: 15px 30px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        #game-over button:hover {
+            background: #f00;
+            color: #000;
         }
 
         .briefing-header {
@@ -409,11 +459,41 @@
             color: #8f8;
             opacity: 0.7;
         }
+
+        .project-tag {
+            font-size: 10px;
+            padding: 1px 4px;
+            border: 1px solid #0f0;
+            border-radius: 2px;
+            margin-left: 5px;
+            color: #0f0;
+            text-transform: uppercase;
+            vertical-align: middle;
+            opacity: 0.8;
+        }
+        
+        .project-link {
+            color: #fff;
+            text-decoration: none;
+            border-bottom: 1px dotted #fff;
+            transition: color 0.2s;
+        }
+        .project-link:hover {
+            color: #0f0;
+            border-bottom: 1px solid #0f0;
+        }
     </style>
 </head>
 <body>
 
     <div class="scanlines"></div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over">
+        <h1>MISSION FAILED</h1>
+        <p style="color: #f88; margin-bottom: 30px; font-size: 18px;">ALL BASES DESTROYED</p>
+        <button onclick="location.reload()">RETRY MISSION</button>
+    </div>
 
     <!-- Mission Briefing -->
     <div id="mission-briefing">
@@ -480,6 +560,7 @@
     <div id="modal-about" class="modal">
         <span class="close-btn" onclick="closeModal()">[X]</span>
         <h2>// Base Station: Alpha</h2>
+        <img src="./matrix.png" alt="Operator" style="display: block; margin: 0 auto 15px auto; width: 120px; border: 2px solid #0f0; border-radius: 50%;">
         <p><strong>Operator:</strong> Eric Djavid</p>
         
         <p><strong>Training Credentials:</strong></p>
@@ -512,13 +593,62 @@
 
     <div id="modal-projects" class="modal">
         <span class="close-btn" onclick="closeModal()">[X]</span>
-        <h2>// Mining Outpost: Beta</h2>
-        <p><strong>Active Deployments:</strong></p>
-        <ul>
-            <li><strong>SaaS Kit:</strong> React/Node starter for founders.</li>
-            <li><strong>Glitch UI:</strong> A cyberpunk component library.</li>
-            <li><strong>Iso-Game:</strong> This very website.</li>
+        <h2>// Eric Djavid</h2>
+        <p><strong>Tech Entrepreneur & Full-Stack Architect</strong></p>
+        <p>
+            I translate complex ideas into scalable tech products. Based in Paris, I specialize in 
+            <strong>AI, Web3, and Full-stack development</strong> (Next.js, Nest.js, Supabase).
+        </p>
+        
+        <p><strong>Featured Projects:</strong></p>
+        <ul style="padding-left: 20px; line-height: 1.6;">
+            <li style="margin-bottom: 10px;">
+                <a href="https://buzzclip.io" target="_blank" class="project-link"><strong>Buzzclip.IO</strong></a>
+                <span class="project-tag">SAAS</span>: 
+                AI Avatar Branding platform. Create realistic avatars for brands to generate UGC content at scale.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <a href="https://apps.apple.com/fr/app/english-with-lewis/id6755333340" target="_blank" class="project-link"><strong>English With Lewis</strong></a>
+                <span class="project-tag">APP</span>: 
+                App to learn English with AI.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <a href="https://founderodyssey.com" target="_blank" class="project-link"><strong>FounderOdyssey.com</strong></a>
+                <span class="project-tag">SAAS</span>: 
+                Challenge your business idea with your AI cofounder.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <a href="https://wellia.ai" target="_blank" class="project-link"><strong>Wellia AI</strong></a>
+                <span class="project-tag">APP</span>: 
+                Mental wellness app for the workplace (iOS/Android).
+            </li>
+            <li style="margin-bottom: 10px;">
+                <a href="https://fullwhere.com" target="_blank" class="project-link"><strong>Fullwhere</strong></a>
+                <span class="project-tag">SAAS</span>: 
+                B2B SaaS for centralizing and managing customer feedback intelligence.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <a href="https://fungiball.io" target="_blank" class="project-link"><strong>Fungiball.IO</strong></a>
+                <span class="project-tag">SAAS</span>: 
+                Next-gen Web3 Tennis marketplace and trading card game.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <a href="https://kablio.com" target="_blank" class="project-link"><strong>Kablio</strong></a>
+                <span class="project-tag">SAAS</span>: 
+                Job search platform connecting talent in the energy & construction sectors.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <span style="text-decoration: line-through; color: #888;"><strong>Reskue.Art</strong></span>
+                <span class="project-tag">MARKETPLACE</span>: 
+                Philanthropic NFT marketplace supporting charities through digital art.
+            </li>
         </ul>
+
+        <p style="margin-top: 20px; border-top: 1px dashed #0f0; padding-top: 10px;">
+            <a href="./Eric_Djav_Reskue.tech.pdf" target="_blank" style="color: #0f0; text-decoration: none; font-weight: bold;">
+                [DOWNLOAD FULL TECH PORTFOLIO .PDF]
+            </a>
+        </p>
     </div>
 
     <div id="modal-contact" class="modal">
@@ -550,8 +680,12 @@
                 ship: 0x00ff00,
                 asteroid: 0x224422,
                 planet: 0x001100,
-                projectile: 0xffff00
-            }
+                projectile: 0xffff00,
+                enemy: 0xff0000,
+                enemyLaser: 0xff3333
+            },
+            attackDelay: 20000, // 20 seconds before first attack
+            baseMaxHealth: 150
         };
 
         // --- STATE ---
@@ -565,10 +699,15 @@
             modalOpen: false,
             lastShotTime: 0,
             projectiles: [],
+            enemies: [],
             mapVisible: true,
             controlsVisible: true,
             briefingShown: false,
-            audioEnabled: true
+            audioEnabled: true,
+            gameActive: true,
+            round: 0,
+            waveInProgress: false,
+            nextWaveTime: 0
         };
 
         // --- AUDIO SYSTEM ---
@@ -758,7 +897,7 @@
         }
 
         // 4. Planets / Bases (Interactive Points)
-        const bases = [];
+        let bases = [];
         
         function createBase(x, z, color, label, type) {
             const group = new THREE.Group();
@@ -794,6 +933,25 @@
             labelSprite.position.y = 6;
             group.add(labelSprite);
 
+            // Health Bar (Sprite - Always Horizontal)
+            const healthCanvas = document.createElement('canvas');
+            healthCanvas.width = 64; healthCanvas.height = 8;
+            const hCtx = healthCanvas.getContext('2d');
+            
+            // Initial Draw
+            hCtx.fillStyle = '#000000';
+            hCtx.fillRect(0, 0, 64, 8);
+            hCtx.fillStyle = '#ff0000';
+            hCtx.fillRect(1, 1, 62, 6); // 1px border
+            
+            const healthTex = new THREE.CanvasTexture(healthCanvas);
+            const healthMat = new THREE.SpriteMaterial({ map: healthTex });
+            const healthBar = new THREE.Sprite(healthMat);
+            healthBar.scale.set(8, 1, 1);
+            healthBar.position.set(0, 8, 0);
+            healthBar.visible = false;
+            group.add(healthBar);
+
             // Floor Ring
             const ringGeo = new THREE.RingGeometry(5, 5.2, 32);
             ringGeo.rotateX(-Math.PI / 2);
@@ -803,16 +961,308 @@
             group.add(ring);
 
             scene.add(group);
-            bases.push({ group, core, type, radius: 5, colorString: '#' + new THREE.Color(color).getHexString() });
+            bases.push({ 
+                group, 
+                core, 
+                type, 
+                radius: 5, 
+                colorString: '#' + new THREE.Color(color).getHexString(),
+                health: CONFIG.baseMaxHealth,
+                maxHealth: CONFIG.baseMaxHealth,
+                healthBar: healthBar,
+                healthCanvas: healthCanvas,
+                healthCtx: hCtx,
+                healthTex: healthTex,
+                lastDamageTime: 0
+            });
+        }
+
+        function updateHealthBar(base) {
+            const ctx = base.healthCtx;
+            const w = base.healthCanvas.width;
+            const h = base.healthCanvas.height;
+            const pct = Math.max(0, base.health / base.maxHealth);
+
+            // Background (Black border)
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, w, h);
+
+            // Health (Red)
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(1, 1, (w - 2) * pct, h - 2);
+
+            base.healthTex.needsUpdate = true;
         }
 
         createBase(-30, -30, 0x00ffff, "ABOUT_BASE", "about");
         createBase(30, -20, 0xff00ff, "PROJECT_HUB", "projects");
         createBase(0, 40, 0xffff00, "COMMS_RELAY", "contact");
 
+        // --- ENEMY SYSTEM ---
+        function createEnemyShip() {
+            const group = new THREE.Group();
+            
+            // Fuselage
+            const fuselageGeo = new THREE.BoxGeometry(1.5, 0.5, 2.5);
+            const mat = new THREE.MeshPhongMaterial({ color: CONFIG.colors.enemy, shininess: 30 });
+            const fuselage = new THREE.Mesh(fuselageGeo, mat);
+            fuselage.castShadow = true;
+            group.add(fuselage);
+
+            // Wings (Forward swept)
+            const wingGeo = new THREE.BoxGeometry(4, 0.2, 1);
+            const wings = new THREE.Mesh(wingGeo, mat);
+            wings.position.set(0, 0, 0.5);
+            wings.rotation.y = Math.PI; // Flip
+            wings.castShadow = true;
+            group.add(wings);
+
+            return group;
+        }
+
+        function spawnEnemy() {
+            if (bases.length === 0) return;
+
+            const angle = Math.random() * Math.PI * 2;
+            const dist = CONFIG.mapBounds - 10;
+            const x = Math.sin(angle) * dist;
+            const z = Math.cos(angle) * dist;
+
+            const mesh = createEnemyShip();
+            mesh.position.set(x, 2, z);
+            
+            scene.add(mesh);
+            
+            // Find closest base initially
+            const targetBase = findClosestBase(mesh.position);
+
+            STATE.enemies.push({ 
+                mesh, 
+                target: targetBase, 
+                speed: 0.15, // Slower speed
+                lastShot: 0,
+                fireRate: 2000 // Fire every 2 seconds
+            });
+        }
+
+        function findClosestBase(pos) {
+            let closest = null;
+            let minDst = Infinity;
+            bases.forEach(b => {
+                const d = pos.distanceTo(b.group.position);
+                if (d < minDst) {
+                    minDst = d;
+                    closest = b;
+                }
+            });
+            return closest;
+        }
+
+        function updateEnemies() {
+            const now = Date.now();
+
+            for (let i = STATE.enemies.length - 1; i >= 0; i--) {
+                const e = STATE.enemies[i];
+                
+                // Re-evaluate target if null or destroyed
+                if (!e.target || !bases.includes(e.target)) {
+                    e.target = findClosestBase(e.mesh.position);
+                    if (!e.target) continue; // No bases left
+                }
+
+                const distToBase = e.mesh.position.distanceTo(e.target.group.position);
+                const attackRange = 25;
+
+                // Look at target
+                e.mesh.lookAt(e.target.group.position);
+
+                // Move if out of range
+                if (distToBase > attackRange) {
+                    const dir = new THREE.Vector3().subVectors(e.target.group.position, e.mesh.position);
+                    dir.y = 0;
+                    dir.normalize();
+                    e.mesh.position.add(dir.multiplyScalar(e.speed));
+                } else {
+                    // Attack Logic
+                    if (now - e.lastShot > e.fireRate) {
+                        enemyShoot(e);
+                        e.lastShot = now;
+                    }
+                }
+
+                // Collision with Player Projectiles
+                for (let j = STATE.projectiles.length - 1; j >= 0; j--) {
+                    const p = STATE.projectiles[j];
+                    if (p.isEnemy) continue; // Don't hit self
+
+                    // Increased hitbox size from 2.5 to 6.0 for easier aiming
+                    if (p.mesh.position.distanceTo(e.mesh.position) < 6.0) {
+                        // Enemy Hit
+                        createExplosion(e.mesh.position, 0xffaa00);
+                        scene.remove(e.mesh);
+                        STATE.enemies.splice(i, 1);
+                        
+                        // Remove Projectile
+                        scene.remove(p.mesh);
+                        STATE.projectiles.splice(j, 1);
+                        
+                        playExplosionSound();
+                        break;
+                    }
+                }
+            }
+        }
+
+        function enemyShoot(enemy) {
+            const geo = new THREE.BoxGeometry(0.4, 0.4, 1.5);
+            const mat = new THREE.MeshBasicMaterial({ color: CONFIG.colors.enemyLaser });
+            const bullet = new THREE.Mesh(geo, mat);
+            
+            bullet.position.copy(enemy.mesh.position);
+            bullet.lookAt(enemy.target.group.position);
+            
+            // Calculate forward vector
+            const direction = new THREE.Vector3().subVectors(enemy.target.group.position, enemy.mesh.position).normalize();
+            
+            scene.add(bullet);
+            // Much slower projectile speed for enemies (0.15 vs player 2.0)
+            STATE.projectiles.push({ mesh: bullet, dir: direction, life: 400, isEnemy: true, speed: 0.15 });
+            playLaserSound();
+        }
+
+        function damageBase(base, amount) {
+            base.health -= amount;
+            base.lastDamageTime = Date.now();
+            
+            // Update Health Bar Texture
+            updateHealthBar(base);
+            
+            // Flash effect
+            base.core.material.emissiveIntensity = 2;
+            setTimeout(() => { if(base.core) base.core.material.emissiveIntensity = 0.5; }, 100);
+
+            if (base.health <= 0) {
+                // Destroy Base
+                createExplosion(base.group.position, 0x00ffff, 5);
+                scene.remove(base.group);
+                bases = bases.filter(b => b !== base);
+                playExplosionSound();
+
+                if (bases.length === 0) {
+                    gameOver();
+                } else if (bases.length === 1) {
+                    showTransmission("⚠️ WARNING: CRITICAL LOSSES DETECTED.\n\nONLY ONE BASE REMAINS.\n\nDEFEND IT AT ALL COSTS, PILOT!");
+                }
+            }
+        }
+
+        function showTransmission(message) {
+            const briefing = document.getElementById('mission-briefing');
+            const textElement = document.getElementById('briefing-text');
+            
+            // Reset
+            briefing.classList.remove('active');
+            void briefing.offsetWidth; // Trigger reflow
+            
+            textElement.textContent = "";
+            briefing.classList.add('active');
+            
+            // Custom typewriter for dynamic messages
+            let index = 0;
+            textElement.classList.add('typewriter');
+            
+            const typeInterval = setInterval(() => {
+                if (index < message.length) {
+                    textElement.textContent = message.substring(0, index + 1);
+                    index++;
+                } else {
+                    clearInterval(typeInterval);
+                    textElement.classList.remove('typewriter');
+                    setTimeout(() => closeBriefing(), 8000);
+                }
+            }, 30);
+        }
+
+        function createExplosion(pos, color, scale = 1) {
+            const expGeo = new THREE.SphereGeometry(1 * scale, 8, 8);
+            const expMat = new THREE.MeshBasicMaterial({ color: color, wireframe: true });
+            const exp = new THREE.Mesh(expGeo, expMat);
+            exp.position.copy(pos);
+            scene.add(exp);
+            trailParticles.push({ mesh: exp, life: 0.5, type: 'explosion' });
+        }
+
+        function updateBases() {
+            bases.forEach(base => {
+                // Health Bar Visibility
+                const dist = planeGroup.position.distanceTo(base.group.position);
+                const recentlyDamaged = Date.now() - base.lastDamageTime < 3000;
+                
+                if (dist < 40 || recentlyDamaged) {
+                    base.healthBar.visible = true;
+                    // Sprite always faces camera automatically, no lookAt needed
+                } else {
+                    base.healthBar.visible = false;
+                }
+            });
+        }
+
+        function updateGameLogic() {
+            if (!STATE.gameActive) return;
+
+            const now = Date.now();
+
+            // Initial Delay
+            if (STATE.round === 0) {
+                if (!STATE.nextWaveTime) STATE.nextWaveTime = now + CONFIG.attackDelay;
+                if (now > STATE.nextWaveTime) {
+                    startNextRound();
+                }
+                return;
+            }
+
+            // Check Wave Status
+            if (STATE.waveInProgress && STATE.enemies.length === 0) {
+                STATE.waveInProgress = false;
+                STATE.nextWaveTime = now + 5000; // Increased to 5 seconds between rounds
+            }
+
+            // Start Next Round
+            if (!STATE.waveInProgress && now > STATE.nextWaveTime) {
+                startNextRound();
+            }
+        }
+
+        function startNextRound() {
+            STATE.round++;
+            STATE.waveInProgress = true;
+            
+            // Slower progression: 1, 1, 2, 2, 3, 3...
+            const count = Math.ceil(STATE.round / 2);
+            
+            // Briefing update for round
+            const briefing = document.getElementById('mission-briefing');
+            if (!briefing.classList.contains('active')) {
+                // Optional: Flash a message about incoming wave
+            }
+
+            for (let i = 0; i < count; i++) {
+                // Stagger spawns significantly (5 seconds between each enemy arrival)
+                setTimeout(() => spawnEnemy(), i * 5000);
+            }
+        }
+
+        function gameOver() {
+            STATE.gameActive = false;
+            document.getElementById('game-over').style.display = 'flex';
+        }
+
 
         // --- INPUT HANDLING ---
         window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
             if (STATE.keys.hasOwnProperty(e.key) || STATE.keys.hasOwnProperty(e.code)) {
                 STATE.keys[e.key] = true;
                 STATE.keys[e.code] = true; 
@@ -862,7 +1312,7 @@
             const direction = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), planeGroup.rotation.y);
             
             scene.add(bullet);
-            STATE.projectiles.push({ mesh: bullet, dir: direction, life: 100 });
+            STATE.projectiles.push({ mesh: bullet, dir: direction, life: 100, isEnemy: false });
             
             // Play laser sound
             playLaserSound();
@@ -876,32 +1326,36 @@
 
             for (let i = STATE.projectiles.length - 1; i >= 0; i--) {
                 const p = STATE.projectiles[i];
-                p.mesh.position.add(p.dir.clone().multiplyScalar(2)); // Bullet speed
+                const speed = p.speed || 2; // Default player speed 2
+                p.mesh.position.add(p.dir.clone().multiplyScalar(speed)); 
                 p.life--;
 
                 let hit = false;
-                // Collision with asteroids
-                for (let j = asteroids.length - 1; j >= 0; j--) {
-                    const ast = asteroids[j];
-                    if (p.mesh.position.distanceTo(ast.mesh.position) < ast.radius + 1) {
-                        // HIT!
-                        // Remove Asteroid
-                        scene.remove(ast.mesh);
-                        asteroids.splice(j, 1);
-                        
-                        // Create explosion effect (simple expansion)
-                        const expGeo = new THREE.SphereGeometry(1, 8, 8);
-                        const expMat = new THREE.MeshBasicMaterial({ color: 0xffaa00, wireframe: true });
-                        const exp = new THREE.Mesh(expGeo, expMat);
-                        exp.position.copy(ast.mesh.position);
-                        scene.add(exp);
-                        trailParticles.push({ mesh: exp, life: 0.5, type: 'explosion' }); // Reuse trail logic for cleanup
 
-                        // Play explosion sound
-                        playExplosionSound();
-
-                        hit = true;
-                        break;
+                // 1. Enemy Projectiles hitting Bases
+                if (p.isEnemy) {
+                    for (let b = 0; b < bases.length; b++) {
+                        const base = bases[b];
+                        if (p.mesh.position.distanceTo(base.group.position) < base.radius) {
+                            damageBase(base, 2); // Reduced Laser damage from 10 to 2
+                            createExplosion(p.mesh.position, 0xff3333, 0.5);
+                            hit = true;
+                            break;
+                        }
+                    }
+                } 
+                // 2. Player Projectiles hitting Asteroids
+                else {
+                    for (let j = asteroids.length - 1; j >= 0; j--) {
+                        const ast = asteroids[j];
+                        if (p.mesh.position.distanceTo(ast.mesh.position) < ast.radius + 1) {
+                            scene.remove(ast.mesh);
+                            asteroids.splice(j, 1);
+                            createExplosion(ast.mesh.position, 0xffaa00);
+                            playExplosionSound();
+                            hit = true;
+                            break;
+                        }
                     }
                 }
 
@@ -1050,6 +1504,14 @@
                 mapCtx.fill();
             });
 
+            // Draw Enemies
+            mapCtx.fillStyle = '#ff0000';
+            STATE.enemies.forEach(e => {
+                mapCtx.beginPath();
+                mapCtx.arc(toMapX(e.mesh.position.x), toMapY(e.mesh.position.z), 2, 0, Math.PI*2);
+                mapCtx.fill();
+            });
+
             // Draw Player
             mapCtx.fillStyle = '#00ff00';
             mapCtx.beginPath();
@@ -1072,10 +1534,16 @@
         function animate() {
             requestAnimationFrame(animate);
 
-            updatePhysics();
-            updateProjectiles();
-            checkInteractions();
-            createEngineTrail();
+            if (STATE.gameActive) {
+                updatePhysics();
+                updateProjectiles();
+                updateEnemies();
+                updateBases();
+                updateGameLogic();
+                checkInteractions();
+                createEngineTrail();
+            }
+            
             updateMinimap();
 
             // Animate Trails & Explosions
