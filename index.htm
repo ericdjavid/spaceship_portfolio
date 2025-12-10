@@ -8,8 +8,8 @@
     <!-- Social Metadata -->
     <meta property="og:title" content="Eric Djavid">
     <meta property="og:description" content="A tactical 3D command center for Eric Djavid's portfolio. Explore. Connect. Build.">
-    <meta property="og:image" content="./ericdjav.jpg">
-    <meta property="og:url" content="https://ericdjav.io">
+    <meta property="og:image" content="./matrix.png">
+    <meta property="og:url" content="https://ericdjav.com">
     <meta property="og:type" content="website">
     
     <meta name="twitter:card" content="summary_large_image">
@@ -65,6 +65,19 @@
             max-width: 300px;
         }
 
+        .resource-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #0f0;
+        }
+
+        .resource-val {
+            color: #fff;
+            font-weight: bold;
+        }
+
         h1 {
             margin: 0 0 5px 0;
             font-size: 20px;
@@ -111,6 +124,60 @@
             font-size: 12px;
             background: #002200;
             color: #fff;
+        }
+
+        #construction-panel {
+            display: none;
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        .build-card {
+            background: rgba(0, 17, 0, 0.9);
+            border: 2px solid #0f0;
+            padding: 10px;
+            width: 120px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .build-card:hover {
+            background: rgba(0, 34, 0, 0.9);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .build-card.selected {
+            border-color: #ffff00;
+            box-shadow: 0 0 15px rgba(255, 255, 0, 0.3);
+        }
+
+        .build-card.disabled {
+            opacity: 0.5;
+            filter: grayscale(1);
+            cursor: not-allowed;
+            border-color: #444;
+        }
+
+        .card-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .card-title {
+            font-size: 12px;
+            color: #0f0;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .card-cost {
+            font-size: 10px;
+            color: #ffff00;
         }
 
         /* Audio Control */
@@ -566,6 +633,14 @@
             <h1>Tactical View</h1>
             <div class="sub-text">Sector: Alpha-9</div>
             <div class="sub-text" id="coords">Pos: 0, 0</div>
+            <div style="margin-top: 10px; border-top: 1px solid #0f0; padding-top: 5px;">
+                <div class="resource-row">
+                    <span>SCORE:</span> <span id="score-val" class="resource-val">0</span>
+                </div>
+                <div class="resource-row">
+                    <span>CARBON:</span> <span id="carbon-val" class="resource-val" style="color: #ffff00;">0</span>
+                </div>
+            </div>
         </div>
 
         <!-- Controls Panel -->
@@ -582,6 +657,24 @@
 
             <span class="sub-text">FIRE:</span>
             <span class="key">ENTER</span>
+            <span class="sub-text">|</span>
+
+            <span class="sub-text">BUILD:</span>
+            <span class="key">B</span>
+        </div>
+
+        <!-- Construction Panel -->
+        <div id="construction-panel">
+            <div class="build-card" id="card-basic-tower" onclick="selectTower('basic')">
+                <div class="card-icon">♜</div>
+                <div class="card-title">BASIC TOWER</div>
+                <div class="card-cost">10 CARBON</div>
+            </div>
+            <div class="build-card" id="card-factory" onclick="selectTower('factory')" style="margin-left: 10px;">
+                <div class="card-icon">🏭</div>
+                <div class="card-title">CARBON FACTORY</div>
+                <div class="card-cost">10 CARBON</div>
+            </div>
         </div>
 
         <!-- Radar Panel -->
@@ -729,12 +822,14 @@
             keys: { 
                 w: false, a: false, s: false, d: false, 
                 ArrowUp: false, ArrowLeft: false, ArrowDown: false, ArrowRight: false,
-                " ": false, Enter: false, m: false, c: false
+                " ": false, Enter: false, m: false, c: false, b: false
             },
             modalOpen: false,
             lastShotTime: 0,
             projectiles: [],
             enemies: [],
+            towers: [],
+            factories: [],
             mapVisible: true,
             controlsVisible: true,
             briefingShown: false,
@@ -742,7 +837,11 @@
             gameActive: true,
             round: 0,
             waveInProgress: false,
-            nextWaveTime: 0
+            nextWaveTime: 0,
+            score: 0,
+            carbon: 10,
+            buildMode: false,
+            selectedBuilding: null
         };
 
         // --- AUDIO SYSTEM ---
@@ -850,6 +949,13 @@
         const gridHelper = new THREE.GridHelper(CONFIG.mapBounds * 2, 40, 0x00ff00, 0x002200);
         scene.add(gridHelper);
 
+        // Hit Plane for Raycasting (Invisible)
+        const hitPlaneGeo = new THREE.PlaneGeometry(CONFIG.mapBounds * 2, CONFIG.mapBounds * 2);
+        const hitPlaneMat = new THREE.MeshBasicMaterial({ visible: false });
+        const hitPlane = new THREE.Mesh(hitPlaneGeo, hitPlaneMat);
+        hitPlane.rotation.x = -Math.PI / 2;
+        scene.add(hitPlane);
+
         // 2. The Plane (Hero)
         const planeGroup = new THREE.Group();
         
@@ -921,6 +1027,225 @@
             
             scene.add(mesh);
             asteroids.push({ mesh, rotSpeed: (Math.random()-0.5) * 0.02, radius: scale });
+        }
+
+        // --- TOWER SYSTEM ---
+        function createTower(x, z) {
+            const group = new THREE.Group();
+            group.position.set(x, 0, z);
+
+            // Base
+            const baseGeo = new THREE.CylinderGeometry(1, 1.5, 1, 8);
+            const baseMat = new THREE.MeshPhongMaterial({ color: 0x444444 });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.y = 0.5;
+            group.add(base);
+
+            // Turret
+            const turretGeo = new THREE.BoxGeometry(1, 0.8, 1.5);
+            const turretMat = new THREE.MeshPhongMaterial({ color: 0xffff00 });
+            const turret = new THREE.Mesh(turretGeo, turretMat);
+            turret.position.y = 1.4;
+            group.add(turret);
+
+            // Barrel
+            const barrelGeo = new THREE.CylinderGeometry(0.2, 0.2, 2, 8);
+            const barrelMat = new THREE.MeshPhongMaterial({ color: 0x888888 });
+            const barrel = new THREE.Mesh(barrelGeo, barrelMat);
+            barrel.rotation.x = Math.PI / 2;
+            barrel.position.set(0, 1.4, 1);
+            group.add(barrel);
+
+            scene.add(group);
+            
+            STATE.towers.push({
+                group: group,
+                turret: turret,
+                range: 30,
+                fireRate: 1500, // Slow fire rate
+                lastShot: 0,
+                damage: 50 // High damage (2 shots to kill 100hp enemy)
+            });
+            
+            // Effect
+            createExplosion(new THREE.Vector3(x, 0, z), 0xffff00, 2);
+        }
+
+        function updateTowers() {
+            const now = Date.now();
+            STATE.towers.forEach(tower => {
+                // Find nearest enemy
+                let nearest = null;
+                let minDst = tower.range;
+
+                STATE.enemies.forEach(e => {
+                    const d = tower.group.position.distanceTo(e.mesh.position);
+                    if (d < minDst) {
+                        minDst = d;
+                        nearest = e;
+                    }
+                });
+
+                if (nearest) {
+                    // Rotate turret
+                    tower.turret.lookAt(nearest.mesh.position);
+                    
+                    // Fire
+                    if (now - tower.lastShot > tower.fireRate) {
+                        tower.lastShot = now;
+                        fireTower(tower, nearest);
+                    }
+                }
+            });
+        }
+
+        // --- FACTORY SYSTEM ---
+        function createFactory(x, z) {
+            const group = new THREE.Group();
+            group.position.set(x, 0, z);
+
+            // Sci-Fi Base (Hexagonal)
+            const baseGeo = new THREE.CylinderGeometry(2.5, 3, 1, 6);
+            const baseMat = new THREE.MeshPhongMaterial({ color: 0x222222, flatShading: true });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.y = 0.5;
+            group.add(base);
+
+            // Energy Core (Glowing)
+            const coreGeo = new THREE.CylinderGeometry(1, 1, 3, 8);
+            const coreMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.8 });
+            const core = new THREE.Mesh(coreGeo, coreMat);
+            core.position.y = 2;
+            group.add(core);
+
+            // Rotating Ring
+            const ringGeo = new THREE.TorusGeometry(2, 0.2, 8, 16);
+            const ringMat = new THREE.MeshPhongMaterial({ color: 0x444444 });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.rotation.x = Math.PI / 2;
+            ring.position.y = 2;
+            group.add(ring);
+
+            // Top Cap
+            const capGeo = new THREE.ConeGeometry(1.5, 1, 6);
+            const capMat = new THREE.MeshPhongMaterial({ color: 0x333333 });
+            const cap = new THREE.Mesh(capGeo, capMat);
+            cap.position.y = 4;
+            group.add(cap);
+
+            // Energy Particles (reusing smoke logic but making it energy)
+            const smokeGeo = new THREE.IcosahedronGeometry(0.3, 0);
+            const smokeMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.8 });
+            const smoke = new THREE.Mesh(smokeGeo, smokeMat);
+            smoke.position.set(0, 4, 0);
+            smoke.visible = false;
+            group.add(smoke);
+
+            // Health Bar
+            const healthCanvas = document.createElement('canvas');
+            healthCanvas.width = 64; healthCanvas.height = 8;
+            const hCtx = healthCanvas.getContext('2d');
+            hCtx.fillStyle = '#000000'; hCtx.fillRect(0, 0, 64, 8);
+            hCtx.fillStyle = '#00ffff'; hCtx.fillRect(1, 1, 62, 6);
+            
+            const healthTex = new THREE.CanvasTexture(healthCanvas);
+            const healthMat = new THREE.SpriteMaterial({ map: healthTex });
+            const healthBar = new THREE.Sprite(healthMat);
+            healthBar.scale.set(6, 0.8, 1);
+            healthBar.position.set(0, 6, 0);
+            healthBar.visible = false;
+            group.add(healthBar);
+
+            scene.add(group);
+            
+            STATE.factories.push({
+                group: group,
+                smoke: smoke,
+                ring: ring,
+                health: 100, // 10 shots from standard enemy (10 dmg)
+                maxHealth: 100,
+                healthBar: healthBar,
+                healthCanvas: healthCanvas,
+                healthCtx: hCtx,
+                healthTex: healthTex,
+                lastDamageTime: 0,
+                lastGen: Date.now(),
+                genRate: 10000
+            });
+            
+            createExplosion(new THREE.Vector3(x, 0, z), 0x00ffff, 2);
+        }
+
+        function updateFactories() {
+            const now = Date.now();
+            STATE.factories.forEach(f => {
+                // Generation
+                if (now - f.lastGen > f.genRate) {
+                    f.lastGen = now;
+                    STATE.carbon += 1;
+                    document.getElementById('carbon-val').innerText = STATE.carbon;
+                    
+                    // Visual effect
+                    f.smoke.visible = true;
+                    f.smoke.scale.set(1,1,1);
+                    f.smoke.position.y = 4;
+                    setTimeout(() => { f.smoke.visible = false; }, 1000);
+                }
+                
+                // Animate smoke (Energy Pulse)
+                if (f.smoke.visible) {
+                    f.smoke.position.y += 0.1;
+                    f.smoke.scale.multiplyScalar(1.05);
+                    f.smoke.material.opacity -= 0.02;
+                }
+                
+                // Animate Ring
+                if (f.ring) {
+                    f.ring.rotation.z += 0.02;
+                    f.ring.rotation.x = Math.PI / 2 + Math.sin(now * 0.002) * 0.2;
+                }
+
+                // Health Bar Visibility
+                const dist = planeGroup.position.distanceTo(f.group.position);
+                const recentlyDamaged = Date.now() - f.lastDamageTime < 3000;
+                
+                if (dist < 30 || recentlyDamaged) {
+                    f.healthBar.visible = true;
+                    
+                    // Update Bar
+                    const ctx = f.healthCtx;
+                    const pct = Math.max(0, f.health / f.maxHealth);
+                    ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, 64, 8);
+                    ctx.fillStyle = '#00ffff'; ctx.fillRect(1, 1, 62 * pct, 6);
+                    f.healthTex.needsUpdate = true;
+                } else {
+                    f.healthBar.visible = false;
+                }
+            });
+        }
+
+        function fireTower(tower, target) {
+            const geo = new THREE.BoxGeometry(0.4, 0.4, 1);
+            const mat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+            const bullet = new THREE.Mesh(geo, mat);
+            
+            bullet.position.copy(tower.group.position);
+            bullet.position.y = 1.4; // Turret height
+            bullet.lookAt(target.mesh.position);
+            
+            const dir = new THREE.Vector3().subVectors(target.mesh.position, bullet.position).normalize();
+            
+            scene.add(bullet);
+            STATE.projectiles.push({ 
+                mesh: bullet, 
+                dir: dir, 
+                life: 100, 
+                isEnemy: false, 
+                isTower: true, // Mark as tower shot
+                speed: 0.8 // Slow projectile
+            });
+            
+            playLaserSound();
         }
 
         // Generate Field
@@ -1034,62 +1359,98 @@
         createBase(0, 40, 0xffff00, "COMMS_RELAY", "contact");
 
         // --- ENEMY SYSTEM ---
-        function createEnemyShip() {
+        function createEnemyShip(type = 'basic') {
             const group = new THREE.Group();
-            
-            // Fuselage
-            const fuselageGeo = new THREE.BoxGeometry(1.5, 0.5, 2.5);
             const mat = new THREE.MeshPhongMaterial({ color: CONFIG.colors.enemy, shininess: 30 });
-            const fuselage = new THREE.Mesh(fuselageGeo, mat);
-            fuselage.castShadow = true;
-            group.add(fuselage);
+            
+            if (type === 'cargo') {
+                // CARGO SHIP (Big, Long)
+                const fuselageGeo = new THREE.BoxGeometry(4, 2, 10);
+                const fuselage = new THREE.Mesh(fuselageGeo, mat);
+                fuselage.castShadow = true;
+                group.add(fuselage);
 
-            // Wings (Forward swept)
-            const wingGeo = new THREE.BoxGeometry(4, 0.2, 1);
-            const wings = new THREE.Mesh(wingGeo, mat);
-            wings.position.set(0, 0, 0.5);
-            wings.rotation.y = Math.PI; // Flip
-            wings.castShadow = true;
-            group.add(wings);
+                // Side Pods
+                const podGeo = new THREE.CylinderGeometry(1, 1, 8, 8);
+                const leftPod = new THREE.Mesh(podGeo, mat);
+                leftPod.rotation.x = Math.PI / 2;
+                leftPod.position.set(-3, 0, 0);
+                group.add(leftPod);
+
+                const rightPod = new THREE.Mesh(podGeo, mat);
+                rightPod.rotation.x = Math.PI / 2;
+                rightPod.position.set(3, 0, 0);
+                group.add(rightPod);
+            } else {
+                // BASIC SHIP
+                const fuselageGeo = new THREE.BoxGeometry(1.5, 0.5, 2.5);
+                const fuselage = new THREE.Mesh(fuselageGeo, mat);
+                fuselage.castShadow = true;
+                group.add(fuselage);
+
+                const wingGeo = new THREE.BoxGeometry(4, 0.2, 1);
+                const wings = new THREE.Mesh(wingGeo, mat);
+                wings.position.set(0, 0, 0.5);
+                wings.rotation.y = Math.PI;
+                wings.castShadow = true;
+                group.add(wings);
+            }
 
             return group;
         }
 
-        function spawnEnemy() {
-            if (bases.length === 0) return;
+        function spawnEnemy(type = 'basic') {
+            if (bases.length === 0 && STATE.factories.length === 0) return;
 
             const angle = Math.random() * Math.PI * 2;
             const dist = CONFIG.mapBounds - 10;
             const x = Math.sin(angle) * dist;
             const z = Math.cos(angle) * dist;
 
-            const mesh = createEnemyShip();
+            const mesh = createEnemyShip(type);
             mesh.position.set(x, 2, z);
             
             scene.add(mesh);
             
-            // Find closest base initially
             const targetBase = findClosestBase(mesh.position);
 
+            const isCargo = type === 'cargo';
+            
             STATE.enemies.push({ 
                 mesh, 
+                type,
                 target: targetBase, 
-                speed: 0.15, // Slower speed
+                speed: isCargo ? 0.03 : 0.15, // Cargo is extremely slow
                 lastShot: 0,
-                fireRate: 2000 // Fire every 2 seconds
+                fireRate: isCargo ? 4000 : 2000, // Cargo fires slower
+                health: isCargo ? 2000 : 100, // 20 shots vs 1 shot (Player dmg 100)
+                maxHealth: isCargo ? 2000 : 100,
+                damage: isCargo ? 25 : 10 // Cargo hits harder (25 dmg)
             });
         }
 
         function findClosestBase(pos) {
             let closest = null;
             let minDst = Infinity;
+            
+            // Check Bases
             bases.forEach(b => {
                 const d = pos.distanceTo(b.group.position);
                 if (d < minDst) {
                     minDst = d;
-                    closest = b;
+                    closest = { type: 'base', obj: b, pos: b.group.position };
                 }
             });
+
+            // Check Factories
+            STATE.factories.forEach(f => {
+                const d = pos.distanceTo(f.group.position);
+                if (d < minDst) {
+                    minDst = d;
+                    closest = { type: 'factory', obj: f, pos: f.group.position };
+                }
+            });
+
             return closest;
         }
 
@@ -1099,21 +1460,21 @@
             for (let i = STATE.enemies.length - 1; i >= 0; i--) {
                 const e = STATE.enemies[i];
                 
-                // Re-evaluate target if null or destroyed
-                if (!e.target || !bases.includes(e.target)) {
+                // Re-evaluate target
+                if (!e.target || (e.target.type === 'base' && !bases.includes(e.target.obj)) || (e.target.type === 'factory' && !STATE.factories.includes(e.target.obj))) {
                     e.target = findClosestBase(e.mesh.position);
-                    if (!e.target) continue; // No bases left
+                    if (!e.target) continue; // No targets left
                 }
 
-                const distToBase = e.mesh.position.distanceTo(e.target.group.position);
+                const distToTarget = e.mesh.position.distanceTo(e.target.pos);
                 const attackRange = 25;
 
                 // Look at target
-                e.mesh.lookAt(e.target.group.position);
+                e.mesh.lookAt(e.target.pos);
 
                 // Move if out of range
-                if (distToBase > attackRange) {
-                    const dir = new THREE.Vector3().subVectors(e.target.group.position, e.mesh.position);
+                if (distToTarget > attackRange) {
+                    const dir = new THREE.Vector3().subVectors(e.target.pos, e.mesh.position);
                     dir.y = 0;
                     dir.normalize();
                     e.mesh.position.add(dir.multiplyScalar(e.speed));
@@ -1125,23 +1486,45 @@
                     }
                 }
 
-                // Collision with Player Projectiles
+                // Collision with Player/Tower Projectiles
                 for (let j = STATE.projectiles.length - 1; j >= 0; j--) {
                     const p = STATE.projectiles[j];
                     if (p.isEnemy) continue; // Don't hit self
 
                     // Increased hitbox size from 2.5 to 6.0 for easier aiming
                     if (p.mesh.position.distanceTo(e.mesh.position) < 6.0) {
-                        // Enemy Hit
-                        createExplosion(e.mesh.position, 0xffaa00);
-                        scene.remove(e.mesh);
-                        STATE.enemies.splice(i, 1);
-                        
+                        // Damage Calculation
+                        const damage = p.isTower ? 50 : 100; // Tower: 2 shots, Player: 1 shot
+                        e.health -= damage;
+
                         // Remove Projectile
                         scene.remove(p.mesh);
                         STATE.projectiles.splice(j, 1);
                         
-                        playExplosionSound();
+                        // Flash effect
+                        e.mesh.children.forEach(c => {
+                            if(c.material) {
+                                const old = c.material.emissive.getHex();
+                                c.material.emissive.setHex(0xffffff);
+                                setTimeout(() => { if(c.material) c.material.emissive.setHex(old); }, 50);
+                            }
+                        });
+
+                        if (e.health <= 0) {
+                            // Enemy Destroyed
+                            createExplosion(e.mesh.position, 0xffaa00);
+                            scene.remove(e.mesh);
+                            STATE.enemies.splice(i, 1);
+                            
+                            // Score
+                            STATE.score += 100;
+                            document.getElementById('score-val').innerText = STATE.score;
+
+                            playExplosionSound();
+                        } else {
+                            // Hit sound but not destroyed
+                            playLaserSound(); 
+                        }
                         break;
                     }
                 }
@@ -1149,19 +1532,28 @@
         }
 
         function enemyShoot(enemy) {
-            const geo = new THREE.BoxGeometry(0.4, 0.4, 1.5);
-            const mat = new THREE.MeshBasicMaterial({ color: CONFIG.colors.enemyLaser });
+            const isCargo = enemy.type === 'cargo';
+            const scale = isCargo ? 2 : 1;
+            
+            const geo = new THREE.BoxGeometry(0.4 * scale, 0.4 * scale, 1.5 * scale);
+            const mat = new THREE.MeshBasicMaterial({ color: isCargo ? 0xff0000 : CONFIG.colors.enemyLaser });
             const bullet = new THREE.Mesh(geo, mat);
             
             bullet.position.copy(enemy.mesh.position);
-            bullet.lookAt(enemy.target.group.position);
+            bullet.lookAt(enemy.target.pos);
             
-            // Calculate forward vector
-            const direction = new THREE.Vector3().subVectors(enemy.target.group.position, enemy.mesh.position).normalize();
+            const direction = new THREE.Vector3().subVectors(enemy.target.pos, enemy.mesh.position).normalize();
             
             scene.add(bullet);
-            // Much slower projectile speed for enemies (0.15 vs player 2.0)
-            STATE.projectiles.push({ mesh: bullet, dir: direction, life: 400, isEnemy: true, speed: 0.15 });
+            
+            STATE.projectiles.push({ 
+                mesh: bullet, 
+                dir: direction, 
+                life: 400, 
+                isEnemy: true, 
+                speed: 0.15,
+                damage: enemy.damage || 10
+            });
             playLaserSound();
         }
 
@@ -1283,7 +1675,15 @@
 
             for (let i = 0; i < count; i++) {
                 // Stagger spawns significantly (5 seconds between each enemy arrival)
-                setTimeout(() => spawnEnemy(), i * 5000);
+                setTimeout(() => spawnEnemy('basic'), i * 5000);
+            }
+
+            // Cargo Ship Logic (Round 5+)
+            if (STATE.round >= 5) {
+                setTimeout(() => {
+                    showTransmission("WARNING: CARGO CLASS HOSTILE DETECTED.");
+                    spawnEnemy('cargo');
+                }, 10000);
             }
         }
 
@@ -1296,7 +1696,13 @@
         // --- INPUT HANDLING ---
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                closeModal();
+                if (STATE.buildMode && STATE.selectedBuilding) {
+                    STATE.selectedBuilding = null;
+                    removeGhost();
+                    updateUI();
+                } else {
+                    closeModal();
+                }
             }
             if (STATE.keys.hasOwnProperty(e.key) || STATE.keys.hasOwnProperty(e.code)) {
                 STATE.keys[e.key] = true;
@@ -1307,6 +1713,9 @@
             }
             if (e.key === 'c' || e.key === 'C') {
                 toggleControls();
+            }
+            if (e.key === 'b' || e.key === 'B') {
+                toggleBuildMode();
             }
         });
 
@@ -1329,10 +1738,151 @@
             ctrlEl.style.display = STATE.controlsVisible ? 'block' : 'none';
         }
 
+        // --- MOUSE & RAYCASTING ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let ghostTower = null;
+
+        window.addEventListener('mousemove', (event) => {
+            // Normalize mouse coordinates
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        window.addEventListener('mousedown', (event) => {
+            if (event.button === 0 && STATE.buildMode) { // Left Click
+                tryBuildTower();
+            }
+        });
+
+        window.selectTower = function(type) {
+            STATE.selectedBuilding = type;
+            createGhost();
+            updateUI();
+        }
+
+        function toggleBuildMode() {
+            STATE.buildMode = !STATE.buildMode;
+            const panel = document.getElementById('construction-panel');
+            panel.style.display = STATE.buildMode ? 'flex' : 'none';
+            
+            if (!STATE.buildMode) {
+                STATE.selectedBuilding = null;
+                removeGhost();
+            }
+        }
+
+        function createGhost() {
+            removeGhost(); // Clear existing
+            if (!STATE.selectedBuilding) return;
+
+            const group = new THREE.Group();
+            
+            if (STATE.selectedBuilding === 'basic') {
+                // Tower Visual
+                const geo = new THREE.CylinderGeometry(1, 1.5, 1, 8);
+                const mat = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5, wireframe: true });
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.position.y = 0.5;
+                group.add(mesh);
+                
+                // Range circle
+                const ringGeo = new THREE.RingGeometry(29, 30, 32);
+                ringGeo.rotateX(-Math.PI / 2);
+                const ringMat = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.position.y = 0.1;
+                group.add(ring);
+            } else if (STATE.selectedBuilding === 'factory') {
+                // Factory Visual (Ghost)
+                const geo = new THREE.CylinderGeometry(2.5, 3, 1, 6);
+                const mat = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5, wireframe: true });
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.position.y = 0.5;
+                group.add(mesh);
+            }
+
+            scene.add(group);
+            ghostTower = group;
+        }
+
+        function removeGhost() {
+            if (ghostTower) {
+                scene.remove(ghostTower);
+                ghostTower = null;
+            }
+        }
+
+        function updateGhost() {
+            if (!STATE.buildMode || !ghostTower) return;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObject(hitPlane);
+
+            if (intersects.length > 0) {
+                const point = intersects[0].point;
+                ghostTower.position.set(point.x, 0, point.z);
+                
+                // Color indication
+                const affordable = STATE.carbon >= 10;
+                const color = affordable ? 0x00ff00 : 0xff0000;
+                
+                ghostTower.children.forEach(c => {
+                    if(c.material) c.material.color.setHex(color);
+                });
+            }
+        }
+
+        function tryBuildTower() {
+            if (!ghostTower || !STATE.selectedBuilding) return;
+            
+            if (STATE.carbon >= 10) {
+                STATE.carbon -= 10;
+                document.getElementById('carbon-val').innerText = STATE.carbon;
+                
+                if (STATE.selectedBuilding === 'basic') {
+                    createTower(ghostTower.position.x, ghostTower.position.z);
+                    showTransmission("DEFENSE TOWER DEPLOYED.");
+                } else if (STATE.selectedBuilding === 'factory') {
+                    createFactory(ghostTower.position.x, ghostTower.position.z);
+                    showTransmission("CARBON FACTORY DEPLOYED.");
+                }
+                
+                playExplosionSound();
+            } else {
+                showTransmission("INSUFFICIENT CARBON. NEED 10.");
+            }
+        }
+
+        function updateUI() {
+            if (STATE.buildMode) {
+                const basicCard = document.getElementById('card-basic-tower');
+                const factoryCard = document.getElementById('card-factory');
+                
+                // Affordability
+                if (STATE.carbon < 10) {
+                    basicCard.classList.add('disabled');
+                    factoryCard.classList.add('disabled');
+                } else {
+                    basicCard.classList.remove('disabled');
+                    factoryCard.classList.remove('disabled');
+                }
+
+                // Selection
+                basicCard.classList.remove('selected');
+                factoryCard.classList.remove('selected');
+                
+                if (STATE.selectedBuilding === 'basic') basicCard.classList.add('selected');
+                if (STATE.selectedBuilding === 'factory') factoryCard.classList.add('selected');
+            }
+        }
+
         // --- GAME LOGIC ---
 
         function shoot() {
             const now = Date.now();
+            if (STATE.buildMode) return; // Disable shooting in build mode
+
             if (now - STATE.lastShotTime < 200) return; // Fire rate limit
             STATE.lastShotTime = now;
 
@@ -1367,15 +1917,39 @@
 
                 let hit = false;
 
-                // 1. Enemy Projectiles hitting Bases
+                // 1. Enemy Projectiles hitting Bases or Factories
                 if (p.isEnemy) {
+                    const dmg = p.damage || 10;
+                    
+                    // Check Bases
                     for (let b = 0; b < bases.length; b++) {
                         const base = bases[b];
                         if (p.mesh.position.distanceTo(base.group.position) < base.radius) {
-                            damageBase(base, 2); // Reduced Laser damage from 10 to 2
+                            damageBase(base, dmg);
                             createExplosion(p.mesh.position, 0xff3333, 0.5);
                             hit = true;
                             break;
+                        }
+                    }
+                    // Check Factories
+                    if (!hit) {
+                        for (let k = STATE.factories.length - 1; k >= 0; k--) {
+                            const f = STATE.factories[k];
+                            if (p.mesh.position.distanceTo(f.group.position) < 3) {
+                                f.health -= dmg;
+                                f.lastDamageTime = Date.now();
+                                createExplosion(p.mesh.position, 0xff3333, 0.5);
+                                hit = true;
+                                
+                                if (f.health <= 0) {
+                                    createExplosion(f.group.position, 0xffaa00, 3);
+                                    scene.remove(f.group);
+                                    STATE.factories.splice(k, 1);
+                                    playExplosionSound();
+                                    showTransmission("FACTORY LOST.");
+                                }
+                                break;
+                            }
                         }
                     }
                 } 
@@ -1387,6 +1961,11 @@
                             scene.remove(ast.mesh);
                             asteroids.splice(j, 1);
                             createExplosion(ast.mesh.position, 0xffaa00);
+                            
+                            // Carbon Drop
+                            STATE.carbon += 1;
+                            document.getElementById('carbon-val').innerText = STATE.carbon;
+                            
                             playExplosionSound();
                             hit = true;
                             break;
@@ -1574,9 +2153,13 @@
                 updateProjectiles();
                 updateEnemies();
                 updateBases();
+                updateTowers();
+                updateFactories(); // Update Factories
                 updateGameLogic();
                 checkInteractions();
                 createEngineTrail();
+                updateGhost();
+                updateUI();
             }
             
             updateMinimap();
@@ -1709,6 +2292,12 @@
             } else {
                 showBriefing();
                 initAudio();
+                
+                // TEST: Spawn Cargo Ship immediately (Remove this line to disable test)
+                setTimeout(() => {
+                    console.log("Spawning Test Cargo Ship");
+                    spawnEnemy('cargo');
+                }, 2000);
             }
         });
 
