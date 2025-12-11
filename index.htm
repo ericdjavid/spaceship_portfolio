@@ -600,7 +600,21 @@
     <!-- Game Over Screen -->
     <div id="game-over">
         <h1>MISSION FAILED</h1>
-        <p style="color: #f88; margin-bottom: 30px; font-size: 18px;">ALL BASES DESTROYED</p>
+        <p style="color: #f88; margin-bottom: 20px; font-size: 18px;">ALL BASES DESTROYED</p>
+        
+        <div id="score-submission" style="margin-bottom: 20px; text-align: center;">
+            <p>FINAL SCORE: <span id="final-score" style="color: #ffff00;">0</span></p>
+            <input type="text" id="pilot-name" placeholder="ENTER PILOT NAME" maxlength="10" style="background: #001100; border: 1px solid #0f0; color: #0f0; padding: 10px; font-family: 'Share Tech Mono'; text-transform: uppercase; margin-right: 10px;">
+            <button onclick="submitScore()" style="padding: 10px 20px;">SUBMIT</button>
+        </div>
+
+        <div id="leaderboard" style="margin-bottom: 30px; width: 300px; text-align: left; border: 1px solid #0f0; padding: 10px; background: rgba(0, 17, 0, 0.8);">
+            <h3 style="margin: 0 0 10px 0; border-bottom: 1px solid #0f0; color: #ffff00;">TOP PILOTS</h3>
+            <ul id="leaderboard-list" style="list-style: none; padding: 0; margin: 0; font-size: 14px;">
+                <li>LOADING...</li>
+            </ul>
+        </div>
+
         <button onclick="location.reload()">RETRY MISSION</button>
     </div>
 
@@ -822,7 +836,32 @@
     <div id="canvas-container"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Try to load config.js if it exists (for local development)
+        var configScript = document.createElement('script');
+        configScript.src = 'config.js';
+        configScript.onerror = function() {
+            console.log('config.js not found, will use inline values');
+        };
+        document.head.appendChild(configScript);
+    </script>
+    <script>
+        // --- SUPABASE SETUP ---
+        // For Vercel: Replace these placeholders during build or use Vercel's Edge Functions
+        // For Local: Uses config.js if available
+        const SUPABASE_URL = (window.env && window.env.SUPABASE_URL) || 
+                            'VERCEL_SUPABASE_URL_PLACEHOLDER';
+        const SUPABASE_KEY = (window.env && window.env.SUPABASE_KEY) || 
+                            'VERCEL_SUPABASE_KEY_PLACEHOLDER';
+        
+        let supabase = null;
+        if (SUPABASE_URL && !SUPABASE_URL.includes('PLACEHOLDER')) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } else {
+            console.warn("Supabase not configured. For local: check config.js. For Vercel: set environment variables.");
+        }
+
         // --- CONFIG ---
         const CONFIG = {
             moveSpeed: 0.4,
@@ -1778,6 +1817,59 @@
         function gameOver() {
             STATE.gameActive = false;
             document.getElementById('game-over').style.display = 'flex';
+            document.getElementById('final-score').innerText = STATE.score;
+            fetchLeaderboard();
+        }
+
+        async function submitScore() {
+            if (!supabase) {
+                alert("Supabase not configured! Check index.htm");
+                return;
+            }
+            
+            const name = document.getElementById('pilot-name').value.trim() || 'UNKNOWN';
+            const score = STATE.score;
+            
+            const { error } = await supabase
+                .from('leaderboard')
+                .insert({ username: name, score: score });
+                
+            if (error) {
+                console.error('Error submitting score:', error);
+                alert('Error submitting score');
+            } else {
+                document.getElementById('score-submission').innerHTML = '<p style="color: #0f0;">SCORE TRANSMITTED</p>';
+                fetchLeaderboard();
+            }
+        }
+
+        async function fetchLeaderboard() {
+            if (!supabase) return;
+            
+            const { data, error } = await supabase
+                .from('leaderboard')
+                .select('*')
+                .order('score', { ascending: false })
+                .limit(5);
+                
+            const list = document.getElementById('leaderboard-list');
+            list.innerHTML = '';
+            
+            if (error) {
+                list.innerHTML = '<li style="color: #f00;">ERROR FETCHING DATA</li>';
+            } else {
+                data.forEach((entry, index) => {
+                    const li = document.createElement('li');
+                    li.style.display = 'flex';
+                    li.style.justifyContent = 'space-between';
+                    li.style.marginBottom = '5px';
+                    li.innerHTML = `
+                        <span>${index + 1}. ${entry.username}</span>
+                        <span style="color: #ffff00;">${entry.score}</span>
+                    `;
+                    list.appendChild(li);
+                });
+            }
         }
 
 
@@ -2449,10 +2541,14 @@
             document.getElementById('carbon-val').innerText = STATE.carbon;
 
             // TEST: Spawn Cargo Ship immediately (Remove this line to disable test)
-            // setTimeout(() => {
-            //     console.log("Spawning Test Cargo Ship");
-            //     spawnEnemy('cargo');
-            // }, 2000);
+            setTimeout(() => {
+                console.log("Spawning Test Cargo Ship");
+                spawnEnemy('cargo');
+                spawnEnemy('cargo');
+                spawnEnemy('cargo');
+                spawnEnemy('cargo');
+                spawnEnemy('cargo');
+            }, 100);
         });
 
         // Initialize and start audio on first user interaction
