@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eric Djavid | Tactical Command</title>
-    
+
     <!-- Social Metadata -->
     <meta property="og:title" content="Eric Djavid">
-    <meta property="og:description" content="A tactical 3D command center for Eric Djavid's portfolio. Explore. Connect. Build.">
+    <meta property="og:description"
+        content="A tactical 3D command center for Eric Djavid's portfolio. Explore. Connect. Build.">
     <meta property="og:image" content="./matrix.png">
     <meta property="og:url" content="https://ericdjav.com">
     <meta property="og:type" content="website">
-    
+
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Eric Djavid | Tactical Command">
-    <meta name="twitter:description" content="A tactical 3D command center for Eric Djavid's portfolio. Explore. Connect. Build.">
+    <meta name="twitter:description"
+        content="A tactical 3D command center for Eric Djavid's portfolio. Explore. Connect. Build.">
     <meta name="twitter:image" content="./ericdjav.jpg">
 
     <style>
@@ -111,7 +114,8 @@
             border: 2px solid #0f0;
             z-index: 20;
             min-width: 400px;
-            display: block; /* Toggled via JS */
+            display: block;
+            /* Toggled via JS */
             pointer-events: auto;
         }
 
@@ -254,7 +258,7 @@
             text-decoration: none;
             border-bottom: 1px dotted #fff;
         }
-        
+
         .sub-text {
             font-size: 12px;
             opacity: 0.9;
@@ -272,10 +276,11 @@
             background: rgba(0, 17, 0, 0.9);
             border: 2px solid #0f0;
             z-index: 20;
-            display: block; /* Toggled via JS */
+            display: block;
+            /* Toggled via JS */
             pointer-events: auto;
         }
-        
+
         #minimap-canvas {
             width: 100%;
             height: 100%;
@@ -308,9 +313,11 @@
         .modal::-webkit-scrollbar {
             width: 8px;
         }
+
         .modal::-webkit-scrollbar-track {
             background: #001100;
         }
+
         .modal::-webkit-scrollbar-thumb {
             background-color: #0f0;
             border-radius: 4px;
@@ -345,13 +352,18 @@
             font-weight: bold;
         }
 
-        .close-btn:hover { color: #fff; }
+        .close-btn:hover {
+            color: #fff;
+        }
 
         /* Scanlines */
         .scanlines {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.2));
             background-size: 100% 4px;
             pointer-events: none;
             z-index: 20;
@@ -384,7 +396,10 @@
 
         #game-over {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(20, 0, 0, 0.8);
             display: none;
             flex-direction: column;
@@ -419,7 +434,10 @@
 
         #mobile-warning {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: #050505;
             display: none;
             flex-direction: column;
@@ -511,8 +529,13 @@
         }
 
         @keyframes scanline {
-            0% { left: -100%; }
-            100% { left: 100%; }
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 100%;
+            }
         }
 
         .briefing-message {
@@ -532,8 +555,10 @@
             font-size: 14px;
             line-height: 1.6;
             color: #0f0;
-            height: 100px; /* Fixed height */
-            overflow-y: auto; /* Scrollable */
+            height: 100px;
+            /* Fixed height */
+            overflow-y: auto;
+            /* Scrollable */
             scrollbar-width: thin;
             scrollbar-color: #0f0 #001100;
         }
@@ -541,9 +566,11 @@
         .message-text::-webkit-scrollbar {
             width: 6px;
         }
+
         .message-text::-webkit-scrollbar-track {
             background: #001100;
         }
+
         .message-text::-webkit-scrollbar-thumb {
             background-color: #0f0;
             border-radius: 3px;
@@ -556,8 +583,13 @@
         }
 
         @keyframes typing {
-            from { border-right: 2px solid #0f0; }
-            to { border-right: 2px solid transparent; }
+            from {
+                border-right: 2px solid #0f0;
+            }
+
+            to {
+                border-right: 2px solid transparent;
+            }
         }
 
         .briefing-footer {
@@ -580,19 +612,21 @@
             vertical-align: middle;
             opacity: 0.8;
         }
-        
+
         .project-link {
             color: #fff;
             text-decoration: none;
             border-bottom: 1px dotted #fff;
             transition: color 0.2s;
         }
+
         .project-link:hover {
             color: #0f0;
             border-bottom: 1px solid #0f0;
         }
     </style>
 </head>
+
 <body>
 
     <div class="scanlines"></div>
@@ -601,14 +635,16 @@
     <div id="game-over">
         <h1>MISSION FAILED</h1>
         <p style="color: #f88; margin-bottom: 20px; font-size: 18px;">ALL BASES DESTROYED</p>
-        
+
         <div id="score-submission" style="margin-bottom: 20px; text-align: center;">
             <p>FINAL SCORE: <span id="final-score" style="color: #ffff00;">0</span></p>
-            <input type="text" id="pilot-name" placeholder="ENTER PILOT NAME" maxlength="10" style="background: #001100; border: 1px solid #0f0; color: #0f0; padding: 10px; font-family: 'Share Tech Mono'; text-transform: uppercase; margin-right: 10px;">
+            <input type="text" id="pilot-name" placeholder="ENTER PILOT NAME" maxlength="10"
+                style="background: #001100; border: 1px solid #0f0; color: #0f0; padding: 10px; font-family: 'Share Tech Mono'; text-transform: uppercase; margin-right: 10px;">
             <button onclick="submitScore()" style="padding: 10px 20px;">SUBMIT</button>
         </div>
 
-        <div id="leaderboard" style="margin-bottom: 30px; width: 300px; text-align: left; border: 1px solid #0f0; padding: 10px; background: rgba(0, 17, 0, 0.8);">
+        <div id="leaderboard"
+            style="margin-bottom: 30px; width: 300px; text-align: left; border: 1px solid #0f0; padding: 10px; background: rgba(0, 17, 0, 0.8);">
             <h3 style="margin: 0 0 10px 0; border-bottom: 1px solid #0f0; color: #ffff00;">TOP PILOTS</h3>
             <ul id="leaderboard-list" style="list-style: none; padding: 0; margin: 0; font-size: 14px;">
                 <li>LOADING...</li>
@@ -626,18 +662,33 @@
     </div>
 
     <!-- Start Screen -->
-    <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 5, 0, 0.95); z-index: 9000; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
-        <h1 style="font-size: 40px; color: #0f0; text-shadow: 0 0 20px #0f0; animation: blink 1s infinite;">// SYSTEM READY</h1>
+    <div id="start-screen"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 5, 0, 0.95); z-index: 9000; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
+        <h1 style="font-size: 40px; color: #0f0; text-shadow: 0 0 20px #0f0; animation: blink 1s infinite;">// SYSTEM
+            READY</h1>
         <p style="color: #fff; font-size: 18px; margin-top: 20px;">[ CLICK TO INITIALIZE INTERFACE ]</p>
     </div>
-    
+
     <!-- Pause Screen -->
-    <div id="pause-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 8000; display: none; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;">
+    <div id="pause-screen"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 8000; display: none; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;">
         <h1 style="font-size: 60px; color: #ffff00; text-shadow: 0 0 20px #ffff00; letter-spacing: 10px;">PAUSED</h1>
     </div>
 
     <style>
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @keyframes blink {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
     </style>
 
     <!-- Mission Briefing -->
@@ -648,7 +699,8 @@
         </div>
         <div class="briefing-content">
             <div class="commander-image">
-                <img src="./matrix.png" alt="Commander" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iIzAwMTEwMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmaWxsPSIjMGYwIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+W05PIElNQUdFXTwvdGV4dD48L3N2Zz4='">
+                <img src="./matrix.png" alt="Commander"
+                    onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iIzAwMTEwMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmaWxsPSIjMGYwIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+W05PIElNQUdFXTwvdGV4dD48L3N2Zz4='">
             </div>
             <div class="briefing-message">
                 <div class="message-sender">COMMANDER ERIC</div>
@@ -661,16 +713,20 @@
     </div>
 
     <div id="ui-layer">
-        
+
         <!-- Audio Control -->
         <div id="audio-toggle" onclick="toggleAudio()" style="pointer-events: auto;">
             <div class="audio-label">AUDIO</div>
             <span id="audio-icon">🔊</span>
             <div class="audio-credits">
-                Music by <a href="https://pixabay.com/users/nickpanek-38266323/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=357518" target="_blank">Nicholas Panek</a> from <a href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=357518" target="_blank">Pixabay</a>
+                Music by <a
+                    href="https://pixabay.com/users/nickpanek-38266323/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=357518"
+                    target="_blank">Nicholas Panek</a> from <a
+                    href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=357518"
+                    target="_blank">Pixabay</a>
             </div>
         </div>
-        
+
         <!-- HUD Panel -->
         <div class="hud-panel">
             <h1>Tactical View</h1>
@@ -689,13 +745,13 @@
         <!-- Controls Panel -->
         <div id="controls-hint">
             <div class="panel-label">CONTROLS [C]</div>
-            
-            <span class="sub-text">NAV:</span> 
+
+            <span class="sub-text">NAV:</span>
             <span class="key">W</span> <span class="key">A</span> <span class="key">S</span> <span class="key">D</span>
             <span class="sub-text">|</span>
-            
+
             <span class="sub-text">BOOST:</span>
-            <span class="key">SPACE</span> 
+            <span class="key">SPACE</span>
             <span class="sub-text">|</span>
 
             <span class="sub-text">FIRE:</span>
@@ -731,19 +787,21 @@
     <div id="modal-about" class="modal">
         <span class="close-btn" onclick="closeModal()">[X]</span>
         <h2>// Base Station: Alpha</h2>
-        <img src="./matrix.png" alt="Operator" style="display: block; margin: 0 auto 15px auto; width: 120px; border: 2px solid #0f0; border-radius: 50%;">
+        <img src="./matrix.png" alt="Operator"
+            style="display: block; margin: 0 auto 15px auto; width: 120px; border: 2px solid #0f0; border-radius: 50%;">
         <p><strong>Operator:</strong> Eric Djavid</p>
-        
+
         <p><strong>Training Credentials:</strong></p>
         <p style="color: #cfc; margin-left: 20px;">
             <span style="color: #ffff00;">►</span> 42 Paris - Elite coding academy<br>
             <span style="color: #ffff00;">►</span> HEC Paris - Business excellence<br>
             <span style="color: #00ffff;">→</span> Unique hybrid: Engineering × Entrepreneurship
         </p>
-        
+
         <p><strong>Mission Profile:</strong></p>
-        <p>I build cool products and travel the world. My approach combines technical depth from 42's peer-to-peer learning methodology with strategic thinking from HEC's business frameworks.</p>
-        
+        <p>I build cool products and travel the world. My approach combines technical depth from 42's peer-to-peer
+            learning methodology with strategic thinking from HEC's business frameworks.</p>
+
         <p><strong>Core Capabilities:</strong></p>
         <p style="color: #cfc; margin-left: 20px;">
             <span style="color: #0f0;">◆</span> Full-stack development & system architecture<br>
@@ -751,12 +809,13 @@
             <span style="color: #0f0;">◆</span> Scalable web systems & 3D interactives<br>
             <span style="color: #0f0;">◆</span> Remote work from anywhere on Earth
         </p>
-        
+
         <p><strong>Philosophy:</strong></p>
         <p style="font-style: italic; color: #8f8; border-left: 2px solid #0f0; padding-left: 15px; margin: 15px 0;">
-            "Turn complex problems into elegant solutions. Ship fast, iterate faster. Build products that matter while exploring the world."
+            "Turn complex problems into elegant solutions. Ship fast, iterate faster. Build products that matter while
+            exploring the world."
         </p>
-        
+
         <p style="text-align: center; margin-top: 20px; color: #ffff00; font-size: 12px;">
             [ STATUS: ACTIVELY BUILDING | LOCATION: VARIABLE ]
         </p>
@@ -767,56 +826,59 @@
         <h2>// Eric Djavid</h2>
         <p><strong>Tech Entrepreneur & Full-Stack Architect</strong></p>
         <p>
-            I translate complex ideas into scalable tech products. Based in Paris, I specialize in 
+            I translate complex ideas into scalable tech products. Based in Paris, I specialize in
             <strong>AI, Web3, and Full-stack development</strong> (Next.js, Nest.js, Supabase).
         </p>
-        
+
         <p><strong>Featured Projects:</strong></p>
         <ul style="padding-left: 20px; line-height: 1.6;">
             <li style="margin-bottom: 10px;">
                 <a href="https://buzzclip.io" target="_blank" class="project-link"><strong>Buzzclip.IO</strong></a>
-                <span class="project-tag">SAAS</span>: 
+                <span class="project-tag">SAAS</span>:
                 AI Avatar Branding platform. Create realistic avatars for brands to generate UGC content at scale.
             </li>
             <li style="margin-bottom: 10px;">
-                <a href="https://apps.apple.com/fr/app/english-with-lewis/id6755333340" target="_blank" class="project-link"><strong>English With Lewis</strong></a>
-                <span class="project-tag">APP</span>: 
+                <a href="https://apps.apple.com/fr/app/english-with-lewis/id6755333340" target="_blank"
+                    class="project-link"><strong>English With Lewis</strong></a>
+                <span class="project-tag">APP</span>:
                 App to learn English with AI.
             </li>
             <li style="margin-bottom: 10px;">
-                <a href="https://founderodyssey.com" target="_blank" class="project-link"><strong>FounderOdyssey.com</strong></a>
-                <span class="project-tag">SAAS</span>: 
+                <a href="https://founderodyssey.com" target="_blank"
+                    class="project-link"><strong>FounderOdyssey.com</strong></a>
+                <span class="project-tag">SAAS</span>:
                 Challenge your business idea with your AI cofounder.
             </li>
             <li style="margin-bottom: 10px;">
                 <a href="https://wellia.ai" target="_blank" class="project-link"><strong>Wellia AI</strong></a>
-                <span class="project-tag">APP</span>: 
+                <span class="project-tag">APP</span>:
                 Mental wellness app for the workplace (iOS/Android).
             </li>
             <li style="margin-bottom: 10px;">
                 <a href="https://fullwhere.com" target="_blank" class="project-link"><strong>Fullwhere</strong></a>
-                <span class="project-tag">SAAS</span>: 
+                <span class="project-tag">SAAS</span>:
                 B2B SaaS for centralizing and managing customer feedback intelligence.
             </li>
             <li style="margin-bottom: 10px;">
                 <a href="https://fungiball.io" target="_blank" class="project-link"><strong>Fungiball.IO</strong></a>
-                <span class="project-tag">SAAS</span>: 
+                <span class="project-tag">SAAS</span>:
                 Next-gen Web3 Tennis marketplace and trading card game.
             </li>
             <li style="margin-bottom: 10px;">
                 <a href="https://kablio.com" target="_blank" class="project-link"><strong>Kablio</strong></a>
-                <span class="project-tag">SAAS</span>: 
+                <span class="project-tag">SAAS</span>:
                 Job search platform connecting talent in the energy & construction sectors.
             </li>
             <li style="margin-bottom: 10px;">
                 <span style="text-decoration: line-through; color: #888;"><strong>Reskue.Art</strong></span>
-                <span class="project-tag">MARKETPLACE</span>: 
+                <span class="project-tag">MARKETPLACE</span>:
                 Philanthropic NFT marketplace supporting charities through digital art.
             </li>
         </ul>
 
         <p style="margin-top: 20px; border-top: 1px dashed #0f0; padding-top: 10px;">
-            <a href="./Eric_Djav_Reskue.tech.pdf" target="_blank" style="color: #0f0; text-decoration: none; font-weight: bold;">
+            <a href="./Eric_Djav_Reskue.tech.pdf" target="_blank"
+                style="color: #0f0; text-decoration: none; font-weight: bold;">
                 [DOWNLOAD FULL TECH PORTFOLIO .PDF]
             </a>
         </p>
@@ -828,8 +890,11 @@
         <p>Frequency Open.</p>
         <p>Email: <a href="mailto:hey@ericdjav.io" style="color: #0f0; text-decoration: none;">hey@ericdjav.io</a></p>
         <p>
-            <a href="https://x.com/ericdjav" target="_blank" style="color: #0f0; margin-right: 15px; text-decoration: none; border-bottom: 1px dashed #0f0;">[X / TWITTER]</a>
-            <a href="https://www.linkedin.com/in/eric-djavid-2154b991/" target="_blank" style="color: #0f0; text-decoration: none; border-bottom: 1px dashed #0f0;">[LINKEDIN]</a>
+            <a href="https://x.com/ericdjav" target="_blank"
+                style="color: #0f0; margin-right: 15px; text-decoration: none; border-bottom: 1px dashed #0f0;">[X /
+                TWITTER]</a>
+            <a href="https://www.linkedin.com/in/eric-djavid-2154b991/" target="_blank"
+                style="color: #0f0; text-decoration: none; border-bottom: 1px dashed #0f0;">[LINKEDIN]</a>
         </p>
     </div>
 
@@ -838,28 +903,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Try to load config.js if it exists (for local development)
-        var configScript = document.createElement('script');
-        configScript.src = 'config.js';
-        configScript.onerror = function() {
-            console.log('config.js not found, will use inline values');
-        };
-        document.head.appendChild(configScript);
-    </script>
-    <script>
         // --- SUPABASE SETUP ---
-        // For Vercel: Replace these placeholders during build or use Vercel's Edge Functions
-        // For Local: Uses config.js if available
-        const SUPABASE_URL = (window.env && window.env.SUPABASE_URL) || 
-                            'VERCEL_SUPABASE_URL_PLACEHOLDER';
-        const SUPABASE_KEY = (window.env && window.env.SUPABASE_KEY) || 
-                            'VERCEL_SUPABASE_KEY_PLACEHOLDER';
-        
+        // For Vercel: build.js replaces these placeholders during build with environment variables
+        // The placeholders are replaced by build.js during Vercel deployment
+        const SUPABASE_URL = 'VERCEL_SUPABASE_URL_PLACEHOLDER';
+        const SUPABASE_KEY = 'VERCEL_SUPABASE_KEY_PLACEHOLDER';
+
+        // Get createClient from the global supabase before we shadow it
+        const { createClient } = supabase;
+
+        // Only initialize Supabase if we have valid values (not placeholders)
         let supabase = null;
-        if (SUPABASE_URL && !SUPABASE_URL.includes('PLACEHOLDER')) {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        if (SUPABASE_URL && SUPABASE_KEY &&
+            !SUPABASE_URL.includes('PLACEHOLDER') &&
+            !SUPABASE_KEY.includes('PLACEHOLDER')) {
+            // Use createClient from the global supabase library
+            supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         } else {
-            console.warn("Supabase not configured. For local: check config.js. For Vercel: set environment variables.");
+            console.warn("Supabase not configured. For Vercel: set SUPABASE_URL and SUPABASE_ANON_KEY environment variables.");
         }
 
         // --- CONFIG ---
@@ -887,8 +948,8 @@
         // --- STATE ---
         const STATE = {
             velocity: new THREE.Vector3(),
-            keys: { 
-                w: false, a: false, s: false, d: false, 
+            keys: {
+                w: false, a: false, s: false, d: false,
                 ArrowUp: false, ArrowLeft: false, ArrowDown: false, ArrowRight: false,
                 " ": false, Enter: false, m: false, c: false, b: false
             },
@@ -924,16 +985,16 @@
 
         function initAudio() {
             if (AUDIO.initialized) return;
-            
+
             // Background Music
             AUDIO.bgMusic = new Audio('./cool_song.mp3');
             AUDIO.bgMusic.loop = true;
             AUDIO.bgMusic.volume = 0.3;
-            
+
             // Laser Sound
             AUDIO.laserSound = new Audio('./laser.mp3');
             AUDIO.laserSound.volume = 0.2;
-            
+
             // Explosion Sound
             AUDIO.explosionSound = new Audio('./explosion.mp3');
             AUDIO.explosionSound.volume = 0.3;
@@ -942,15 +1003,15 @@
             AUDIO.typingSound = new Audio('./text-writting.mp3');
             AUDIO.typingSound.loop = true;
             AUDIO.typingSound.volume = 0.2;
-            
+
             // Manual loop fallback
-            AUDIO.typingSound.addEventListener('ended', function() {
+            AUDIO.typingSound.addEventListener('ended', function () {
                 this.currentTime = 0;
-                this.play().catch(e => {});
+                this.play().catch(e => { });
             }, false);
-            
+
             AUDIO.initialized = true;
-            
+
             // Start background music
             if (STATE.audioEnabled) {
                 AUDIO.bgMusic.play().catch(e => {
@@ -963,7 +1024,7 @@
             STATE.audioEnabled = !STATE.audioEnabled;
             const icon = document.getElementById('audio-icon');
             const toggle = document.getElementById('audio-toggle');
-            
+
             if (STATE.audioEnabled) {
                 icon.textContent = '🔊';
                 toggle.classList.remove('muted');
@@ -998,15 +1059,15 @@
         // --- SCENE SETUP ---
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(CONFIG.colors.bg);
-        
+
         // ISOMETRIC CAMERA setup
         const aspect = window.innerWidth / window.innerHeight;
         const d = CONFIG.camZoom;
         const camera = new THREE.OrthographicCamera(-d * aspect, d * aspect, d, -d, 1, 1000);
-        
+
         // Classic Isometric Angle
-        camera.position.set(20, 20, 20); 
-        camera.lookAt(scene.position); 
+        camera.position.set(20, 20, 20);
+        camera.lookAt(scene.position);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -1039,7 +1100,7 @@
 
         // 2. The Plane (Hero)
         const planeGroup = new THREE.Group();
-        
+
         // Fuselage
         const fuselageGeo = new THREE.BoxGeometry(1.5, 0.5, 3);
         const planeMat = new THREE.MeshPhongMaterial({ color: 0x00cc00, shininess: 50 });
@@ -1079,13 +1140,13 @@
 
         function createAsteroid(x, z, scale) {
             const geo = new THREE.IcosahedronGeometry(1, 0);
-            const mat = new THREE.MeshPhongMaterial({ 
-                color: CONFIG.colors.asteroid, 
+            const mat = new THREE.MeshPhongMaterial({
+                color: CONFIG.colors.asteroid,
                 flatShading: true,
-                wireframe: false 
+                wireframe: false
             });
             const mesh = new THREE.Mesh(geo, mat);
-            
+
             // Randomize shape slightly
             const posAttribute = geo.attributes.position;
             for (let i = 0; i < posAttribute.count; i++) {
@@ -1102,12 +1163,12 @@
             mesh.scale.set(scale, scale, scale);
             mesh.castShadow = true;
             mesh.receiveShadow = true;
-            
+
             // Random rotation
-            mesh.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
-            
+            mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+
             scene.add(mesh);
-            asteroids.push({ mesh, rotSpeed: (Math.random()-0.5) * 0.02, radius: scale });
+            asteroids.push({ mesh, rotSpeed: (Math.random() - 0.5) * 0.02, radius: scale });
         }
 
         // --- TOWER SYSTEM ---
@@ -1138,7 +1199,7 @@
             group.add(barrel);
 
             scene.add(group);
-            
+
             STATE.towers.push({
                 group: group,
                 turret: turret,
@@ -1147,7 +1208,7 @@
                 lastShot: 0,
                 damage: 50 // High damage (2 shots to kill 100hp enemy)
             });
-            
+
             // Effect
             createExplosion(new THREE.Vector3(x, 0, z), 0xffff00, 2);
         }
@@ -1170,7 +1231,7 @@
                 if (nearest) {
                     // Rotate turret
                     tower.turret.lookAt(nearest.mesh.position);
-                    
+
                     // Fire
                     if (now - tower.lastShot > tower.fireRate) {
                         tower.lastShot = now;
@@ -1228,7 +1289,7 @@
             const hCtx = healthCanvas.getContext('2d');
             hCtx.fillStyle = '#000000'; hCtx.fillRect(0, 0, 64, 8);
             hCtx.fillStyle = '#00ffff'; hCtx.fillRect(1, 1, 62, 6);
-            
+
             const healthTex = new THREE.CanvasTexture(healthCanvas);
             const healthMat = new THREE.SpriteMaterial({ map: healthTex });
             const healthBar = new THREE.Sprite(healthMat);
@@ -1238,7 +1299,7 @@
             group.add(healthBar);
 
             scene.add(group);
-            
+
             STATE.factories.push({
                 group: group,
                 smoke: smoke,
@@ -1253,7 +1314,7 @@
                 lastGen: Date.now(),
                 genRate: 7000
             });
-            
+
             createExplosion(new THREE.Vector3(x, 0, z), 0x00ffff, 2);
         }
 
@@ -1265,21 +1326,21 @@
                     f.lastGen = now;
                     STATE.carbon += 1;
                     document.getElementById('carbon-val').innerText = STATE.carbon;
-                    
+
                     // Visual effect
                     f.smoke.visible = true;
-                    f.smoke.scale.set(1,1,1);
+                    f.smoke.scale.set(1, 1, 1);
                     f.smoke.position.y = 4;
                     setTimeout(() => { f.smoke.visible = false; }, 1000);
                 }
-                
+
                 // Animate smoke (Energy Pulse)
                 if (f.smoke.visible) {
                     f.smoke.position.y += 0.1;
                     f.smoke.scale.multiplyScalar(1.05);
                     f.smoke.material.opacity -= 0.02;
                 }
-                
+
                 // Animate Ring
                 if (f.ring) {
                     f.ring.rotation.z += 0.02;
@@ -1289,10 +1350,10 @@
                 // Health Bar Visibility
                 const dist = planeGroup.position.distanceTo(f.group.position);
                 const recentlyDamaged = Date.now() - f.lastDamageTime < 3000;
-                
+
                 if (dist < 30 || recentlyDamaged) {
                     f.healthBar.visible = true;
-                    
+
                     // Update Bar
                     const ctx = f.healthCtx;
                     const pct = Math.max(0, f.health / f.maxHealth);
@@ -1309,28 +1370,28 @@
             const geo = new THREE.BoxGeometry(0.4, 0.4, 1);
             const mat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
             const bullet = new THREE.Mesh(geo, mat);
-            
+
             bullet.position.copy(tower.group.position);
             bullet.position.y = 1.4; // Turret height
             bullet.lookAt(target.mesh.position);
-            
+
             const dir = new THREE.Vector3().subVectors(target.mesh.position, bullet.position).normalize();
-            
+
             scene.add(bullet);
-            STATE.projectiles.push({ 
-                mesh: bullet, 
-                dir: dir, 
-                life: 100, 
-                isEnemy: false, 
+            STATE.projectiles.push({
+                mesh: bullet,
+                dir: dir,
+                life: 100,
+                isEnemy: false,
                 isTower: true, // Mark as tower shot
                 speed: 0.8 // Slow projectile
             });
-            
+
             playLaserSound();
         }
 
         // Generate Field
-        for(let i=0; i<30; i++) {
+        for (let i = 0; i < 30; i++) {
             const x = (Math.random() - 0.5) * 160;
             const z = (Math.random() - 0.5) * 160;
             if (Math.abs(x) < 10 && Math.abs(z) < 10) continue;
@@ -1339,7 +1400,7 @@
 
         // 4. Planets / Bases (Interactive Points)
         let bases = [];
-        
+
         function createBase(x, z, color, label, type) {
             const group = new THREE.Group();
             group.position.set(x, 0, z);
@@ -1366,7 +1427,7 @@
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(label, 128, 32);
-            
+
             const tex = new THREE.CanvasTexture(canvas);
             const labelMat = new THREE.SpriteMaterial({ map: tex, transparent: true });
             const labelSprite = new THREE.Sprite(labelMat);
@@ -1378,13 +1439,13 @@
             const healthCanvas = document.createElement('canvas');
             healthCanvas.width = 64; healthCanvas.height = 8;
             const hCtx = healthCanvas.getContext('2d');
-            
+
             // Initial Draw
             hCtx.fillStyle = '#000000';
             hCtx.fillRect(0, 0, 64, 8);
             hCtx.fillStyle = '#ff0000';
             hCtx.fillRect(1, 1, 62, 6); // 1px border
-            
+
             const healthTex = new THREE.CanvasTexture(healthCanvas);
             const healthMat = new THREE.SpriteMaterial({ map: healthTex });
             const healthBar = new THREE.Sprite(healthMat);
@@ -1402,7 +1463,7 @@
             rCtx.textAlign = 'center';
             rCtx.textBaseline = 'middle';
             rCtx.fillText('+', 32, 34);
-            
+
             const repairTex = new THREE.CanvasTexture(repairCanvas);
             const repairMat = new THREE.SpriteMaterial({ map: repairTex, transparent: true });
             const repairIcon = new THREE.Sprite(repairMat);
@@ -1420,11 +1481,11 @@
             group.add(ring);
 
             scene.add(group);
-            bases.push({ 
-                group, 
-                core, 
-                type, 
-                radius: 5, 
+            bases.push({
+                group,
+                core,
+                type,
+                radius: 5,
                 colorString: '#' + new THREE.Color(color).getHexString(),
                 health: CONFIG.baseMaxHealth,
                 maxHealth: CONFIG.baseMaxHealth,
@@ -1462,7 +1523,7 @@
         function createEnemyShip(type = 'basic') {
             const group = new THREE.Group();
             const mat = new THREE.MeshPhongMaterial({ color: CONFIG.colors.enemy, shininess: 30 });
-            
+
             if (type === 'cargo') {
                 // CARGO SHIP (Big, Long)
                 const fuselageGeo = new THREE.BoxGeometry(4, 2, 10);
@@ -1509,17 +1570,17 @@
 
             const mesh = createEnemyShip(type);
             mesh.position.set(x, 2, z);
-            
+
             scene.add(mesh);
-            
+
             const targetBase = findClosestBase(mesh.position);
 
             const isCargo = type === 'cargo';
-            
-            STATE.enemies.push({ 
-                mesh, 
+
+            STATE.enemies.push({
+                mesh,
                 type,
-                target: targetBase, 
+                target: targetBase,
                 speed: isCargo ? 0.03 : 0.15, // Cargo is extremely slow
                 lastShot: 0,
                 fireRate: isCargo ? 4000 : 2000, // Cargo fires slower
@@ -1532,7 +1593,7 @@
         function findClosestBase(pos) {
             let closest = null;
             let minDst = Infinity;
-            
+
             // Check Bases
             bases.forEach(b => {
                 const d = pos.distanceTo(b.group.position);
@@ -1559,7 +1620,7 @@
 
             for (let i = STATE.enemies.length - 1; i >= 0; i--) {
                 const e = STATE.enemies[i];
-                
+
                 // Re-evaluate target
                 if (!e.target || (e.target.type === 'base' && !bases.includes(e.target.obj)) || (e.target.type === 'factory' && !STATE.factories.includes(e.target.obj))) {
                     e.target = findClosestBase(e.mesh.position);
@@ -1600,13 +1661,13 @@
                         // Remove Projectile
                         scene.remove(p.mesh);
                         STATE.projectiles.splice(j, 1);
-                        
+
                         // Flash effect
                         e.mesh.children.forEach(c => {
-                            if(c.material) {
+                            if (c.material) {
                                 const old = c.material.emissive.getHex();
                                 c.material.emissive.setHex(0xffffff);
-                                setTimeout(() => { if(c.material) c.material.emissive.setHex(old); }, 50);
+                                setTimeout(() => { if (c.material) c.material.emissive.setHex(old); }, 50);
                             }
                         });
 
@@ -1615,7 +1676,7 @@
                             createExplosion(e.mesh.position, 0xffaa00);
                             scene.remove(e.mesh);
                             STATE.enemies.splice(i, 1);
-                            
+
                             // Score
                             STATE.score += 100;
                             document.getElementById('score-val').innerText = STATE.score;
@@ -1623,7 +1684,7 @@
                             playExplosionSound();
                         } else {
                             // Hit sound but not destroyed
-                            playLaserSound(); 
+                            playLaserSound();
                         }
                         break;
                     }
@@ -1634,23 +1695,23 @@
         function enemyShoot(enemy) {
             const isCargo = enemy.type === 'cargo';
             const scale = isCargo ? 2 : 1;
-            
+
             const geo = new THREE.BoxGeometry(0.4 * scale, 0.4 * scale, 1.5 * scale);
             const mat = new THREE.MeshBasicMaterial({ color: isCargo ? 0xff0000 : CONFIG.colors.enemyLaser });
             const bullet = new THREE.Mesh(geo, mat);
-            
+
             bullet.position.copy(enemy.mesh.position);
             bullet.lookAt(enemy.target.pos);
-            
+
             const direction = new THREE.Vector3().subVectors(enemy.target.pos, enemy.mesh.position).normalize();
-            
+
             scene.add(bullet);
-            
-            STATE.projectiles.push({ 
-                mesh: bullet, 
-                dir: direction, 
-                life: 400, 
-                isEnemy: true, 
+
+            STATE.projectiles.push({
+                mesh: bullet,
+                dir: direction,
+                life: 400,
+                isEnemy: true,
                 speed: 0.15,
                 damage: enemy.damage || 10
             });
@@ -1660,13 +1721,13 @@
         function damageBase(base, amount) {
             base.health -= amount;
             base.lastDamageTime = Date.now();
-            
+
             // Update Health Bar Texture
             updateHealthBar(base);
-            
+
             // Flash effect
             base.core.material.emissiveIntensity = 2;
-            setTimeout(() => { if(base.core) base.core.material.emissiveIntensity = 0.5; }, 100);
+            setTimeout(() => { if (base.core) base.core.material.emissiveIntensity = 0.5; }, 100);
 
             if (base.health <= 0) {
                 // Destroy Base
@@ -1690,7 +1751,7 @@
 
             const briefing = document.getElementById('mission-briefing');
             const textElement = document.getElementById('briefing-text');
-            
+
             // Force display reset
             briefing.style.display = 'block';
             briefing.style.opacity = '1';
@@ -1699,20 +1760,20 @@
             // Reset
             briefing.classList.remove('active');
             void briefing.offsetWidth; // Trigger reflow
-            
+
             textElement.textContent = "";
             briefing.classList.add('active');
-            
+
             // Start Audio
             if (STATE.audioEnabled && AUDIO.typingSound) {
                 AUDIO.typingSound.currentTime = 0;
                 AUDIO.typingSound.play().catch(e => console.log("Audio play failed:", e));
             }
-            
+
             // Custom typewriter for dynamic messages
             let index = 0;
             textElement.classList.add('typewriter');
-            
+
             const typeInterval = setInterval(() => {
                 if (index < message.length) {
                     textElement.textContent = message.substring(0, index + 1);
@@ -1741,10 +1802,10 @@
                 // Health Bar Visibility
                 const dist = planeGroup.position.distanceTo(base.group.position);
                 const recentlyDamaged = Date.now() - base.lastDamageTime < 3000;
-                
+
                 if (dist < 40 || recentlyDamaged) {
                     base.healthBar.visible = true;
-                    
+
                     // Show Repair Icon if damaged
                     if (base.health < base.maxHealth) {
                         base.repairIcon.visible = true;
@@ -1790,10 +1851,10 @@
         function startNextRound() {
             STATE.round++;
             STATE.waveInProgress = true;
-            
+
             // Slower progression: 1, 1, 2, 2, 3, 3...
             const count = Math.ceil(STATE.round / 2);
-            
+
             // Briefing update for round
             const briefing = document.getElementById('mission-briefing');
             if (!briefing.classList.contains('active')) {
@@ -1826,14 +1887,14 @@
                 alert("Supabase not configured! Check index.htm");
                 return;
             }
-            
+
             const name = document.getElementById('pilot-name').value.trim() || 'UNKNOWN';
             const score = STATE.score;
-            
+
             const { error } = await supabase
                 .from('leaderboard')
                 .insert({ username: name, score: score });
-                
+
             if (error) {
                 console.error('Error submitting score:', error);
                 alert('Error submitting score');
@@ -1845,16 +1906,16 @@
 
         async function fetchLeaderboard() {
             if (!supabase) return;
-            
+
             const { data, error } = await supabase
                 .from('leaderboard')
                 .select('*')
                 .order('score', { ascending: false })
                 .limit(5);
-                
+
             const list = document.getElementById('leaderboard-list');
             list.innerHTML = '';
-            
+
             if (error) {
                 list.innerHTML = '<li style="color: #f00;">ERROR FETCHING DATA</li>';
             } else {
@@ -1886,7 +1947,7 @@
             }
             if (STATE.keys.hasOwnProperty(e.key) || STATE.keys.hasOwnProperty(e.code)) {
                 STATE.keys[e.key] = true;
-                STATE.keys[e.code] = true; 
+                STATE.keys[e.code] = true;
             }
             if (e.key === 'm' || e.key === 'M') {
                 toggleMinimap();
@@ -1942,7 +2003,7 @@
                 if (STATE.buildMode) {
                     tryBuildTower();
                 }
-                
+
                 // Check for Base Repair Click
                 checkBaseRepairClick();
             }
@@ -1950,7 +2011,7 @@
 
         function checkBaseRepairClick() {
             raycaster.setFromCamera(mouse, camera);
-            
+
             bases.forEach(base => {
                 if (base.repairIcon.visible) {
                     const intersects = raycaster.intersectObject(base.repairIcon);
@@ -1960,10 +2021,10 @@
                             if (base.health < base.maxHealth) {
                                 STATE.carbon -= 5;
                                 document.getElementById('carbon-val').innerText = STATE.carbon;
-                                
+
                                 base.health = Math.min(base.maxHealth, base.health + 50);
                                 updateHealthBar(base);
-                                
+
                                 // Effect
                                 createExplosion(base.group.position, 0x00ff00, 2);
                                 showTransmission("BASE REPAIRED.");
@@ -1978,7 +2039,7 @@
             });
         }
 
-        window.selectTower = function(type) {
+        window.selectTower = function (type) {
             STATE.selectedBuilding = type;
             createGhost();
             updateUI();
@@ -1988,7 +2049,7 @@
             STATE.buildMode = !STATE.buildMode;
             const panel = document.getElementById('construction-panel');
             panel.style.display = STATE.buildMode ? 'flex' : 'none';
-            
+
             if (!STATE.buildMode) {
                 STATE.selectedBuilding = null;
                 removeGhost();
@@ -2000,7 +2061,7 @@
             if (!STATE.selectedBuilding) return;
 
             const group = new THREE.Group();
-            
+
             if (STATE.selectedBuilding === 'basic') {
                 // Tower Visual
                 const geo = new THREE.CylinderGeometry(1, 1.5, 1, 8);
@@ -2008,7 +2069,7 @@
                 const mesh = new THREE.Mesh(geo, mat);
                 mesh.position.y = 0.5;
                 group.add(mesh);
-                
+
                 // Range circle
                 const ringGeo = new THREE.RingGeometry(29, 30, 32);
                 ringGeo.rotateX(-Math.PI / 2);
@@ -2045,24 +2106,24 @@
             if (intersects.length > 0) {
                 const point = intersects[0].point;
                 ghostTower.position.set(point.x, 0, point.z);
-                
+
                 // Color indication
                 const affordable = STATE.carbon >= 10;
                 const color = affordable ? 0x00ff00 : 0xff0000;
-                
+
                 ghostTower.children.forEach(c => {
-                    if(c.material) c.material.color.setHex(color);
+                    if (c.material) c.material.color.setHex(color);
                 });
             }
         }
 
         function tryBuildTower() {
             if (!ghostTower || !STATE.selectedBuilding) return;
-            
+
             if (STATE.carbon >= 10) {
                 STATE.carbon -= 10;
                 document.getElementById('carbon-val').innerText = STATE.carbon;
-                
+
                 if (STATE.selectedBuilding === 'basic') {
                     createTower(ghostTower.position.x, ghostTower.position.z);
                     showTransmission("DEFENSE TOWER DEPLOYED.");
@@ -2070,7 +2131,7 @@
                     createFactory(ghostTower.position.x, ghostTower.position.z);
                     showTransmission("CARBON FACTORY DEPLOYED.");
                 }
-                
+
                 playExplosionSound();
             } else {
                 showTransmission("INSUFFICIENT CARBON. NEED 10.");
@@ -2081,7 +2142,7 @@
             if (STATE.buildMode) {
                 const basicCard = document.getElementById('card-basic-tower');
                 const factoryCard = document.getElementById('card-factory');
-                
+
                 // Affordability
                 if (STATE.carbon < 10) {
                     basicCard.classList.add('disabled');
@@ -2094,7 +2155,7 @@
                 // Selection
                 basicCard.classList.remove('selected');
                 factoryCard.classList.remove('selected');
-                
+
                 if (STATE.selectedBuilding === 'basic') basicCard.classList.add('selected');
                 if (STATE.selectedBuilding === 'factory') factoryCard.classList.add('selected');
             }
@@ -2112,16 +2173,16 @@
             const geo = new THREE.BoxGeometry(0.3, 0.3, 1);
             const mat = new THREE.MeshBasicMaterial({ color: CONFIG.colors.projectile });
             const bullet = new THREE.Mesh(geo, mat);
-            
+
             bullet.position.copy(planeGroup.position);
             bullet.rotation.copy(planeGroup.rotation);
-            
+
             // Calculate forward vector
             const direction = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), planeGroup.rotation.y);
-            
+
             scene.add(bullet);
             STATE.projectiles.push({ mesh: bullet, dir: direction, life: 100, isEnemy: false });
-            
+
             // Play laser sound
             playLaserSound();
         }
@@ -2135,7 +2196,7 @@
             for (let i = STATE.projectiles.length - 1; i >= 0; i--) {
                 const p = STATE.projectiles[i];
                 const speed = p.speed || 2; // Default player speed 2
-                p.mesh.position.add(p.dir.clone().multiplyScalar(speed)); 
+                p.mesh.position.add(p.dir.clone().multiplyScalar(speed));
                 p.life--;
 
                 let hit = false;
@@ -2143,7 +2204,7 @@
                 // 1. Enemy Projectiles hitting Bases or Factories
                 if (p.isEnemy) {
                     const dmg = p.damage || 10;
-                    
+
                     // Check Bases
                     for (let b = 0; b < bases.length; b++) {
                         const base = bases[b];
@@ -2163,7 +2224,7 @@
                                 f.lastDamageTime = Date.now();
                                 createExplosion(p.mesh.position, 0xff3333, 0.5);
                                 hit = true;
-                                
+
                                 if (f.health <= 0) {
                                     createExplosion(f.group.position, 0xffaa00, 3);
                                     scene.remove(f.group);
@@ -2175,7 +2236,7 @@
                             }
                         }
                     }
-                } 
+                }
                 // 2. Player Projectiles hitting Asteroids
                 else {
                     for (let j = asteroids.length - 1; j >= 0; j--) {
@@ -2184,11 +2245,11 @@
                             scene.remove(ast.mesh);
                             asteroids.splice(j, 1);
                             createExplosion(ast.mesh.position, 0xffaa00);
-                            
+
                             // Carbon Drop
                             STATE.carbon += 1;
                             document.getElementById('carbon-val').innerText = STATE.carbon;
-                            
+
                             playExplosionSound();
                             hit = true;
                             break;
@@ -2221,14 +2282,14 @@
 
             // Apply Acceleration / Friction
             if (input.length() > 0) {
-                STATE.velocity.add(input.multiplyScalar(0.05)); 
+                STATE.velocity.add(input.multiplyScalar(0.05));
                 STATE.velocity.clampLength(0, currentMaxSpeed);
-                
+
                 const angle = Math.atan2(STATE.velocity.x, STATE.velocity.z);
                 let rotDiff = angle - planeGroup.rotation.y;
                 while (rotDiff > Math.PI) rotDiff -= Math.PI * 2;
                 while (rotDiff < -Math.PI) rotDiff += Math.PI * 2;
-                
+
                 planeGroup.rotation.y += rotDiff * 0.1;
                 planeGroup.rotation.z = -rotDiff * 0.5;
             } else {
@@ -2246,13 +2307,13 @@
 
             // Camera Follow
             const camOffset = new THREE.Vector3(20, 20, 20);
-            
+
             // Adjust camera lag for warp effect (snap if distance is huge)
             if (camera.position.distanceTo(planeGroup.position) > 100) {
-                 camera.position.copy(planeGroup.position).add(camOffset);
+                camera.position.copy(planeGroup.position).add(camOffset);
             } else {
-                 const targetPos = planeGroup.position.clone().add(camOffset);
-                 camera.position.lerp(targetPos, 0.1);
+                const targetPos = planeGroup.position.clone().add(camOffset);
+                camera.position.lerp(targetPos, 0.1);
             }
         }
 
@@ -2264,7 +2325,7 @@
                 base.core.position.y = 2 + Math.sin(Date.now() * 0.002 + base.core.userData.offset) * 0.5;
                 if (dist < base.radius) {
                     openModal(base.type);
-                    STATE.velocity.set(0,0,0);
+                    STATE.velocity.set(0, 0, 0);
                 }
             });
         }
@@ -2274,7 +2335,7 @@
             document.getElementById(`modal-${type}`).classList.add('active');
         }
 
-        window.closeModal = function() {
+        window.closeModal = function () {
             document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
             setTimeout(() => { STATE.modalOpen = false; }, 200);
             planeGroup.position.x -= Math.sin(planeGroup.rotation.y) * 5;
@@ -2291,10 +2352,10 @@
             const color = boost ? 0xffff00 : 0x00ff00; // Yellow for boost
             const mat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.6 });
             const p = new THREE.Mesh(geo, mat);
-            
-            const offset = new THREE.Vector3(0, 0, 1.5).applyAxisAngle(new THREE.Vector3(0,1,0), planeGroup.rotation.y);
+
+            const offset = new THREE.Vector3(0, 0, 1.5).applyAxisAngle(new THREE.Vector3(0, 1, 0), planeGroup.rotation.y);
             p.position.copy(planeGroup.position).add(offset);
-            
+
             scene.add(p);
             trailParticles.push({ mesh: p, life: 1.0, type: 'trail' });
         }
@@ -2313,12 +2374,12 @@
             // Clear
             mapCtx.fillStyle = '#001100';
             mapCtx.fillRect(0, 0, w, h);
-            
+
             // Grid Lines (Visual only)
             mapCtx.strokeStyle = '#003300';
             mapCtx.beginPath();
-            mapCtx.moveTo(w/2, 0); mapCtx.lineTo(w/2, h);
-            mapCtx.moveTo(0, h/2); mapCtx.lineTo(w, h/2);
+            mapCtx.moveTo(w / 2, 0); mapCtx.lineTo(w / 2, h);
+            mapCtx.moveTo(0, h / 2); mapCtx.lineTo(w, h / 2);
             mapCtx.stroke();
 
             // Transform helper
@@ -2329,7 +2390,7 @@
             mapCtx.fillStyle = '#446644';
             asteroids.forEach(a => {
                 mapCtx.beginPath();
-                mapCtx.arc(toMapX(a.mesh.position.x), toMapY(a.mesh.position.z), 2, 0, Math.PI*2);
+                mapCtx.arc(toMapX(a.mesh.position.x), toMapY(a.mesh.position.z), 2, 0, Math.PI * 2);
                 mapCtx.fill();
             });
 
@@ -2337,7 +2398,7 @@
             bases.forEach(b => {
                 mapCtx.fillStyle = b.colorString;
                 mapCtx.beginPath();
-                mapCtx.arc(toMapX(b.group.position.x), toMapY(b.group.position.z), 4, 0, Math.PI*2);
+                mapCtx.arc(toMapX(b.group.position.x), toMapY(b.group.position.z), 4, 0, Math.PI * 2);
                 mapCtx.fill();
             });
 
@@ -2345,7 +2406,7 @@
             mapCtx.fillStyle = '#ff0000';
             STATE.enemies.forEach(e => {
                 mapCtx.beginPath();
-                mapCtx.arc(toMapX(e.mesh.position.x), toMapY(e.mesh.position.z), 2, 0, Math.PI*2);
+                mapCtx.arc(toMapX(e.mesh.position.x), toMapY(e.mesh.position.z), 2, 0, Math.PI * 2);
                 mapCtx.fill();
             });
 
@@ -2354,7 +2415,7 @@
             mapCtx.beginPath();
             const px = toMapX(planeGroup.position.x);
             const py = toMapY(planeGroup.position.z);
-            
+
             // Draw simple triangle for player direction
             mapCtx.save();
             mapCtx.translate(px, py);
@@ -2386,24 +2447,24 @@
                 updateGhost();
                 updateUI();
             }
-            
+
             updateMinimap();
 
             // Animate Trails & Explosions
             for (let i = trailParticles.length - 1; i >= 0; i--) {
                 const p = trailParticles[i];
                 p.life -= p.type === 'explosion' ? 0.05 : 0.02;
-                
+
                 if (p.type === 'explosion') {
                     p.mesh.scale.multiplyScalar(1.1); // Expand
                     p.mesh.material.opacity = p.life;
                 } else {
-                    p.mesh.position.y += 0.05; 
+                    p.mesh.position.y += 0.05;
                     p.mesh.rotation.x += 0.1;
                     p.mesh.scale.multiplyScalar(0.95);
                     p.mesh.material.opacity = p.life;
                 }
-                
+
                 if (p.life <= 0) {
                     scene.remove(p.mesh);
                     trailParticles.splice(i, 1);
@@ -2414,7 +2475,7 @@
                 a.mesh.rotation.y += a.rotSpeed;
                 a.mesh.rotation.x += a.rotSpeed;
             });
-            
+
             // HUD Update
             document.getElementById('coords').innerText = `POS: ${Math.round(planeGroup.position.x)}, ${Math.round(planeGroup.position.z)}`;
 
@@ -2447,7 +2508,7 @@
         function showBriefing() {
             if (STATE.briefingShown) return;
             STATE.briefingShown = true;
-            
+
             setTimeout(() => {
                 const briefing = document.getElementById('mission-briefing');
                 briefing.classList.add('active');
@@ -2459,7 +2520,7 @@
             const textElement = document.getElementById('briefing-text');
             const fullText = briefingMessages.join(' ');
             let index = 0;
-            
+
             // Start Audio
             if (STATE.audioEnabled && AUDIO.typingSound) {
                 AUDIO.typingSound.currentTime = 0;
@@ -2467,7 +2528,7 @@
             }
 
             textElement.classList.add('typewriter');
-            
+
             const typeInterval = setInterval(() => {
                 if (index < fullText.length) {
                     textElement.textContent = fullText.substring(0, index + 1);
@@ -2477,7 +2538,7 @@
                     clearInterval(typeInterval);
                     textElement.classList.remove('typewriter');
                     if (AUDIO.typingSound) AUDIO.typingSound.pause();
-                    
+
                     // Auto-close after 15 seconds
                     setTimeout(() => {
                         closeBriefing();
@@ -2491,7 +2552,7 @@
             const briefing = document.getElementById('mission-briefing');
             briefing.style.opacity = '0';
             briefing.style.transform = 'translateY(20px)';
-            
+
             if (briefingCloseTimer) clearTimeout(briefingCloseTimer);
             briefingCloseTimer = setTimeout(() => {
                 briefing.classList.remove('active');
@@ -2519,7 +2580,7 @@
         window.addEventListener('load', () => {
             // Mobile Check
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
-            
+
             if (isMobile) {
                 document.getElementById('mobile-warning').style.display = 'flex';
                 STATE.gameActive = false; // Stop game logic
@@ -2533,10 +2594,10 @@
             const screen = document.getElementById('start-screen');
             screen.style.opacity = '0';
             setTimeout(() => screen.style.display = 'none', 500);
-            
+
             initAudio();
             showBriefing();
-            
+
             // Ensure UI matches State
             document.getElementById('carbon-val').innerText = STATE.carbon;
 
@@ -2569,4 +2630,5 @@
 
     </script>
 </body>
+
 </html>
